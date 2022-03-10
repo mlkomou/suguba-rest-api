@@ -1,6 +1,9 @@
 package com.wassa.suguba.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "commande")
@@ -12,6 +15,18 @@ public class Commande extends Generality{
     String statut;
     @ManyToOne
     Client client;
+
+    @OneToMany(mappedBy = "commande")
+    @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
+    private List<LigneCommande> ligneCommandes;
+
+    public List<LigneCommande> getLigneCommandes() {
+        return ligneCommandes;
+    }
+
+    public void setLigneCommandes(List<LigneCommande> ligneCommandes) {
+        this.ligneCommandes = ligneCommandes;
+    }
 
     public String getAdressePath() {
         return adressePath;

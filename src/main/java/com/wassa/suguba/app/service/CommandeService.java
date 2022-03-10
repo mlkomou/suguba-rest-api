@@ -5,6 +5,7 @@ import com.wassa.suguba.app.entity.Commande;
 import com.wassa.suguba.app.entity.LigneCommande;
 import com.wassa.suguba.app.entity.Produit;
 import com.wassa.suguba.app.payload.CommandePayload;
+import com.wassa.suguba.app.payload.NotificationPayload;
 import com.wassa.suguba.app.repository.ClientRepository;
 import com.wassa.suguba.app.repository.CommandeRepository;
 import com.wassa.suguba.app.repository.LigneCommendeRepository;
@@ -23,18 +24,24 @@ public class CommandeService {
     private final ClientRepository clientRepository;
     private final LigneCommendeRepository ligneCommendeRepository;
     private final ProduitRepository produitRepository;
+    private final NotificationService notificationService;
 
-    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository) {
+    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService) {
         this.commandeRepository = commandeRepository;
         this.clientRepository = clientRepository;
         this.ligneCommendeRepository = ligneCommendeRepository;
         this.produitRepository = produitRepository;
+        this.notificationService = notificationService;
     }
 
 
     public Map<String, Object> saveCommande(CommandePayload commandePayload) {
       try {
+          NotificationPayload notificationPayload = new NotificationPayload();
+
             List<LigneCommande> ligneArray = new ArrayList();
+            List<String> included_segments = new ArrayList<>();
+            included_segments.add(commandePayload.getOneSignalNotificationId());
             Commande commande = new Commande();
             Client client = new Client();
             client.setPhone(commandePayload.getPhnoneClient());
@@ -48,6 +55,11 @@ public class CommandeService {
             commande.setStatut(commandePayload.getStatut());
             Commande commandeSaved = commandeRepository.save(commande);
 
+            notificationPayload.setCommandeId(commandeSaved.getId());
+            notificationPayload.setType("COMMANDE");
+            notificationPayload.setTitre("COMMANDE");
+            notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
+
             commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
                 Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
                 LigneCommande ligneCommande = new LigneCommande();
@@ -57,6 +69,7 @@ public class CommandeService {
                 ligneArray.add(ligneCommande);
             });
             ligneCommendeRepository.saveAll(ligneArray);
+            notificationService.saveNotification(notificationPayload, included_segments);
 
             return Response.success(commandeSaved, "Commande enregistrée.");
         } catch (Exception e) {
@@ -81,7 +94,7 @@ public class CommandeService {
         try {
             Pageable paging = PageRequest.of(page, size);
             Page<Commande> commandes = commandeRepository.findAll(paging);
-            return Response.error(commandes, "Liste des commandes.");
+            return Response.success(commandes, "Liste des commandes.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }
@@ -90,7 +103,7 @@ public class CommandeService {
     public Map<String, Object> getCommandes() {
         try {
             List<Commande> commandes = commandeRepository.findAll();
-            return Response.error(commandes, "Liste des commandes.");
+            return Response.success(commandes, "Liste des commandes.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }

@@ -47,7 +47,7 @@ public class ProduitCommandeService {
         try {
             Pageable paging = PageRequest.of(page, size);
             Page<ProduitCommande> produits = produitCommandeRepository.findAll(paging);
-            return Response.error(produits, "Liste des produits.");
+            return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }

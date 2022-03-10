@@ -10,6 +10,15 @@ public class CommandePayload {
    public String adresse;
    public String adressePath;
    public String statut;
+   public String oneSignalNotificationId;
+
+    public String getOneSignalNotificationId() {
+        return oneSignalNotificationId;
+    }
+
+    public void setOneSignalNotificationId(String oneSignalNotificationId) {
+        this.oneSignalNotificationId = oneSignalNotificationId;
+    }
 
     public List<LigneQuantite> getLigneQuantites() {
         return ligneQuantites;

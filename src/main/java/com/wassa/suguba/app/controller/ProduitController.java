@@ -45,12 +45,14 @@ public class ProduitController {
         return produitService.getProduits();
     }
 
-    @GetMapping("/categorie/{catId}")
-    public Map<String, Object> getProduitsByCategorie(@PathVariable Long catId) {
-        return produitService.getProduitsByCategorie(catId);
+    @GetMapping("/categorie/{catId}/{page}/{size}")
+    public Map<String, Object> getProduitsByCategorie(@PathVariable Long catId,
+                                                      @PathVariable int page,
+                                                      @PathVariable int size) {
+        return produitService.getProduitsByCategorie(catId, page, size);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getProduitsByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return produitService.getProduitsByPage(page, size);
     }

@@ -32,7 +32,7 @@ public class ProduitCommandeController {
         return produitCommandeService.getProduitCommandes();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getProduitCommandesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return produitCommandeService.getProduitCommandesByPage(page, size);
     }

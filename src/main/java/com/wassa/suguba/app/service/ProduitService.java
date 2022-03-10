@@ -69,7 +69,7 @@ public class ProduitService {
         try {
             Pageable paging = PageRequest.of(page, size);
             Page<Produit> produits = produitRepository.findAll(paging);
-            return Response.error(produits, "Liste des produits.");
+            return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }
@@ -84,9 +84,10 @@ public class ProduitService {
         }
     }
 
-    public Map<String, Object> getProduitsByCategorie(Long catId) {
+    public Map<String, Object> getProduitsByCategorie(Long catId, int page, int size) {
         try {
-            List<Produit> produits = produitRepository.findAllByCategorieId(catId);
+            Pageable paging = PageRequest.of(page, size);
+            Page<Produit> produits = produitRepository.findAllByCategorieId(catId, paging);
             return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
