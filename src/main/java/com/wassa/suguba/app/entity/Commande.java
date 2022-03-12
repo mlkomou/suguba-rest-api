@@ -13,12 +13,30 @@ public class Commande extends Generality{
     String adresse;
     String adressePath;
     String statut;
+    String oneSignalNotificationId;
+    String email;
     @ManyToOne
     Client client;
 
     @OneToMany(mappedBy = "commande")
     @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
     private List<LigneCommande> ligneCommandes;
+
+    public String getOneSignalNotificationId() {
+        return oneSignalNotificationId;
+    }
+
+    public void setOneSignalNotificationId(String oneSignalNotificationId) {
+        this.oneSignalNotificationId = oneSignalNotificationId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public List<LigneCommande> getLigneCommandes() {
         return ligneCommandes;

@@ -68,6 +68,39 @@ public class AuthService {
         }
     }
 
+    public ResponseEntity<Map<String, Object>> signupMobileUser(String oneSignalUserId) {
+        try {
+            Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.getApplicationUserByOneSignalUserId(oneSignalUserId);
+            if (applicationUserOptional.isPresent()) {
+                return new ResponseEntity<>(Response.success(applicationUserOptional.get(), "Authentification réussie"), HttpStatus.OK);
+            }
+            ApplicationUser applicationUser = new ApplicationUser();
+            applicationUser.setOneSignalUserId(oneSignalUserId);
+            applicationUser.setUsername(oneSignalUserId);
+            applicationUser.setType("PHONEUSER");
+            applicationUser.setPassword(oneSignalUserId);
+            ApplicationUser applicationUserSaved =  applicationUserRepository.save(applicationUser);
+
+            UserConnected userConnected = new UserConnected();
+
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(applicationUserSaved.getUsername(), applicationUser.getPassword()));
+            System.out.println("phone user" + applicationUserSaved.getUsername());
+            Date exp = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+            Key key = Keys.hmacShaKeyFor(KEY.getBytes());
+            Claims claims = Jwts.claims().setSubject(((User) authentication.getPrincipal()).getUsername());
+            String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, key).setExpiration(exp).compact();
+            userConnected.setToken(token);
+            userConnected.setUsername(applicationUserSaved.getUsername());
+            userConnected.setApplicationUser(applicationUserSaved);
+
+            return new ResponseEntity<>(Response.success(userConnected, "Authentification réussie"), HttpStatus.OK);
+        } catch (Exception e) {
+            System.err.println("auth error: " + e);
+            return new ResponseEntity<>(Response.success(e, "Authentification réussie"), HttpStatus.OK);
+
+        }
+    }
+
     public ResponseEntity<Map<String, Object>> getAllUsers(int page, int size) {
         try {
             Pageable paging = PageRequest.of(page, size);

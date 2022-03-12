@@ -11,6 +11,15 @@ public class CommandePayload {
    public String adressePath;
    public String statut;
    public String oneSignalNotificationId;
+    public String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getOneSignalNotificationId() {
         return oneSignalNotificationId;

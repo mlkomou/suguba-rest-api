@@ -11,8 +11,17 @@ import javax.persistence.Table;
 public class Client extends Generality{
     String phone;
     String nom;
+    String email;
     String namePath;
     String phonePath;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getNamePath() {
         return namePath;

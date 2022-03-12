@@ -11,7 +11,15 @@ public class ApplicationUser {
     private String username;
     private String password;
     private String type;
+    private String oneSignalUserId;
 
+    public String getOneSignalUserId() {
+        return oneSignalUserId;
+    }
+
+    public void setOneSignalUserId(String oneSignalUserId) {
+        this.oneSignalUserId = oneSignalUserId;
+    }
 
     public long getId() {
         return id;

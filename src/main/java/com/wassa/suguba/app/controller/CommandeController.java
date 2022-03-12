@@ -1,10 +1,17 @@
 package com.wassa.suguba.app.controller;
 
+import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Commande;
 import com.wassa.suguba.app.payload.CommandePayload;
 import com.wassa.suguba.app.service.CommandeService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController
@@ -37,4 +44,21 @@ public class CommandeController {
         return commandeService.getCommandesByPage(page, size);
     }
 
+    @ResponseBody
+    @GetMapping("/logo/{photo}")
+    public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
+        String path = UploadPath.LOGO_DOWNLOAD_LINK;
+        try {
+            Path fileName = Paths.get(path, photo);
+            byte[] buffer = Files.readAllBytes(fileName);
+            ByteArrayResource byteArrayResource = new ByteArrayResource(buffer);
+            return ResponseEntity.ok()
+                    .contentLength(buffer.length)
+                    .contentType(MediaType.parseMediaType("image/png"))
+                    .body(byteArrayResource);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }

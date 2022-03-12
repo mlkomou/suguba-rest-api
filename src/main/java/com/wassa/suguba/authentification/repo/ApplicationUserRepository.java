@@ -12,4 +12,5 @@ public interface ApplicationUserRepository extends JpaRepository<ApplicationUser
     Optional<ApplicationUser> findByUsername(String username);
     Page<ApplicationUser> findAll(Pageable pageable);
     List<ApplicationUser> findAllByType(String type);
+    Optional<ApplicationUser> getApplicationUserByOneSignalUserId(String userId);
 }

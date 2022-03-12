@@ -25,13 +25,15 @@ public class CommandeService {
     private final LigneCommendeRepository ligneCommendeRepository;
     private final ProduitRepository produitRepository;
     private final NotificationService notificationService;
+    private final SendEmailService sendEmailService;
 
-    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService) {
+    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService) {
         this.commandeRepository = commandeRepository;
         this.clientRepository = clientRepository;
         this.ligneCommendeRepository = ligneCommendeRepository;
         this.produitRepository = produitRepository;
         this.notificationService = notificationService;
+        this.sendEmailService = sendEmailService;
     }
 
 
@@ -44,11 +46,13 @@ public class CommandeService {
             included_segments.add(commandePayload.getOneSignalNotificationId());
             Commande commande = new Commande();
             Client client = new Client();
+            client.setEmail(commandePayload.getEmail());
             client.setPhone(commandePayload.getPhnoneClient());
             client.setNom(commandePayload.getNomClient());
             Client clientSaved = clientRepository.save(client);
 
             commande.setClient(clientSaved);
+            commande.setOneSignalNotificationId(commandePayload.getOneSignalNotificationId());
             commande.setAdresse(commandePayload.getAdresse());
             commande.setAdressePath(commandePayload.getAdressePath());
             commande.setNumero(commandePayload.getNumero());
@@ -70,6 +74,7 @@ public class CommandeService {
             });
             ligneCommendeRepository.saveAll(ligneArray);
             notificationService.saveNotification(notificationPayload, included_segments);
+            sendEmailService.sendEmailWithAttachment(client);
 
             return Response.success(commandeSaved, "Commande enregistrée.");
         } catch (Exception e) {

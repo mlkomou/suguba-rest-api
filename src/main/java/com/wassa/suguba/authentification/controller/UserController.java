@@ -35,5 +35,10 @@ public class UserController {
         return authService.loginUser(user);
     }
 
+    @PostMapping("/user-phone")
+    public ResponseEntity<Map<String, Object>> signupMobile(@RequestParam("oneSignalUserId") String oneSignalUserId) {
+        return authService.signupMobileUser(oneSignalUserId);
+    }
+
 
 }
