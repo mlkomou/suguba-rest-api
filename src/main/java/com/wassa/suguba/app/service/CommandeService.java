@@ -40,7 +40,7 @@ public class CommandeService {
     public Map<String, Object> saveCommande(CommandePayload commandePayload) {
       try {
           NotificationPayload notificationPayload = new NotificationPayload();
-
+          String message = "Votre commande est en cours de traitement, nous vous contacterons pour la livraison. Merci d'avoir choisi SUGUBA.";
             List<LigneCommande> ligneArray = new ArrayList();
             List<String> included_segments = new ArrayList<>();
             included_segments.add(commandePayload.getOneSignalNotificationId());
@@ -74,9 +74,12 @@ public class CommandeService {
             });
             ligneCommendeRepository.saveAll(ligneArray);
             notificationService.saveNotification(notificationPayload, included_segments);
-            sendEmailService.sendEmailWithAttachment(client);
 
-            return Response.success(commandeSaved, "Commande enregistrée.");
+            if (client.getEmail() != null) {
+                sendEmailService.sendEmailWithAttachment(client.getEmail(), client.getNom(), message, "SUGUBA RECEPTION DE COMMANDE");
+                return Response.success(commandeSaved, "Commande enregistrée.");
+            }
+          return Response.success(commandeSaved, "Commande enregistrée.");
         } catch (Exception e) {
             return Response.error(e, "Erreur d'enregistrement de la commande.");
         }

@@ -19,19 +19,26 @@ import java.util.Optional;
 public class BanqueService {
     private final BanqueRepository banqueRepository;
     private final UploadFileService uploadFileService;
+    private final SendEmailService sendEmailService;
 
-    public BanqueService(BanqueRepository banqueRepository, UploadFileService uploadFileService) {
+    public BanqueService(BanqueRepository banqueRepository, UploadFileService uploadFileService, SendEmailService sendEmailService) {
         this.banqueRepository = banqueRepository;
         this.uploadFileService = uploadFileService;
+        this.sendEmailService = sendEmailService;
     }
 
     public Map<String, Object> saveBanque(Banque banque, MultipartFile photo) {
         try {
-            banque.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            banque.setPath(uploadFileService.uploadFile(photo, UploadPath.BANQUE_DOWNLOAD_LINK));
+            String message = "Votre demande de prêt est an cours de traitement. Nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA";
             Banque banqueSaced = banqueRepository.save(banque);
-            return Response.success(banqueSaced, "Banque enregistrée.");
+            if (banque.getMail() != null) {
+                sendEmailService.sendEmailWithAttachment(banque.getMail(), banque.getPrenom() + " " + banque.getNom(), message, "SUGUBA DEMANDE DE PRÊT");
+                return Response.success(banqueSaced, "Demande de prêt envoyée.");
+            }
+            return Response.success(banqueSaced, "Demande de prêt envoyée.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la banque.");
+            return Response.error(e, "Erreur d'enregistrement de la demande.");
         }
     }
 
@@ -39,7 +46,7 @@ public class BanqueService {
         try {
             Optional<Banque> banqueOptional = banqueRepository.findById(banque.getId());
             if (banqueOptional.isPresent()) {
-                banque.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                banque.setPath(uploadFileService.uploadFile(photo, UploadPath.BANQUE_DOWNLOAD_LINK));
                 Banque banqueSaced = banqueRepository.save(banque);
                 return Response.success(banqueSaced, "Banque modifiée.");
             }

@@ -8,6 +8,11 @@ public class SecurityConstants {
     public static final String DOWNLOAD_PRODUIT = "/produits/**";
     public static final String DOWNLOAD_CATEGORIE = "/categories/**";
     public static final String DOWNLOAD_COMMANDE = "/commandes/**";
+    public static final String DOWNLOAD_PHARMACIE = "/pharmacies/**";
+    public static final String DOWNLOAD_VOYAGE = "/voyages/**";
+    public static final String DOWNLOAD_PAIEMENTFACTURE = "/paiement_factures/**";
+    public static final String DOWNLOAD_IMMOBILIER = "/immobiliers/**";
+    public static final String BANQUE_IMMOBILIER = "/banques/**";
 
 
     public static final String KEY = "q3t6w9z$C&F)J@NcQfTjWnZr4u7x!A%D*G-KaPdSgUkXp2s5v8y/B?E(H+MbQeTh";

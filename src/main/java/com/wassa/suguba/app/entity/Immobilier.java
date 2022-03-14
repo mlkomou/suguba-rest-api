@@ -12,6 +12,24 @@ public class Immobilier extends Generality{
     private Double montantMax;
     private Double montantMin;
     private String phone;
+    private String mail;
+    private String path;
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public String getType() {
         return type;

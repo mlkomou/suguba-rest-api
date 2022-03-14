@@ -13,10 +13,10 @@ public class SendEmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void sendEmailWithAttachment(Client client) {
+    public void sendEmailWithAttachment(String mail, String nom, String message, String objet) {
         try {
             MimeMessage msg = javaMailSender.createMimeMessage();
-          String  message = "<!DOCTYPE html>\n" +
+          String  messageFormated = "<!DOCTYPE html>\n" +
                     "\n" +
                     "<html lang=\"en\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:v=\"urn:schemas-microsoft-com:vml\">\n" +
                     "<head>\n" +
@@ -153,7 +153,7 @@ public class SendEmailService {
                     "<div style=\"font-family: sans-serif\">\n" +
                     "<div style=\"font-size: 12px; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 18px; color: #052d3d; line-height: 1.5;\">\n" +
                     "<p style=\"margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 75px;\"><span style=\"font-size:50px;\"><strong><span style=\"font-size:50px;\"><span style=\"font-size:38px;\">BONJOUR</span></span></strong></span></p>\n" +
-                    "<p style=\"margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 51px;\"><span style=\"font-size:34px;\"><strong><span style=\"font-size:34px;\"><span style=\"color:#662483;font-size:34px;\">"+client.getNom()+"</span></span></strong></span></p>\n" +
+                    "<p style=\"margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 51px;\"><span style=\"font-size:34px;\"><strong><span style=\"font-size:34px;\"><span style=\"color:#662483;font-size:34px;\">"+nom+"</span></span></strong></span></p>\n" +
                     "</div>\n" +
                     "</div>\n" +
                     "</td>\n" +
@@ -165,7 +165,7 @@ public class SendEmailService {
                     "<div style=\"font-family: sans-serif\">\n" +
                     "<div style=\"font-size: 12px; mso-line-height-alt: 14.399999999999999px; color: #555555; line-height: 1.2; font-family: Lato, Tahoma, Verdana, Segoe, sans-serif;\">\n" +
                     "<p style=\"margin: 0; font-size: 14px; text-align: center;\"><span style=\"font-size:18px;color:#000000;\">\n" +
-                    "\tVotre commande est en cours de traitement, nous vous contacterons pour la livraison. Merci d'avoir choisi SUGUBA.\n" +
+                    "\t"+message+"\n" +
                     "</span></p>\n" +
                     "</div>\n" +
                     "</div>\n" +
@@ -302,14 +302,15 @@ public class SendEmailService {
 
             // true = multipart message
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
-            helper.setTo(client.getEmail());
+            helper.setTo(mail);
 
-            helper.setSubject("SUGUBA RECEPTION DE COMMANDE");
+            helper.setSubject(objet);
+//            helper.setSubject("SUGUBA RECEPTION DE COMMANDE");
 
             // default = text/plain
             //helper.setText("Check attachment for image!");
 
-            helper.setText(message, true);
+            helper.setText(messageFormated, true);
             javaMailSender.send(msg);
 
         } catch (Exception e) {

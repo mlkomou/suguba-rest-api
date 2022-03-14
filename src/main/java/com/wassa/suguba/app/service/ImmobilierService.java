@@ -1,5 +1,6 @@
 package com.wassa.suguba.app.service;
 
+import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Immobilier;
 import com.wassa.suguba.app.repository.ImmobilierRepository;
 import com.wassa.suguba.authentification.entity.Response;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +18,28 @@ import java.util.Optional;
 @Service
 public class ImmobilierService {
     private final ImmobilierRepository immobilierRepository;
+    private final UploadFileService uploadFileService;
+    private final SendEmailService sendEmailService;
 
-    public ImmobilierService(ImmobilierRepository immobilierRepository) {
+    public ImmobilierService(ImmobilierRepository immobilierRepository, UploadFileService uploadFileService, SendEmailService sendEmailService) {
         this.immobilierRepository = immobilierRepository;
+        this.uploadFileService = uploadFileService;
+        this.sendEmailService = sendEmailService;
+    }
+
+    public Map<String, Object> saveImmobilierWithFile(Immobilier immobilier, MultipartFile photo) {
+        try {
+            immobilier.setPath(uploadFileService.uploadFile(photo, UploadPath.IMMOBILIER_DOWNLOAD_LINK));
+            Immobilier immobilierSaved = immobilierRepository.save(immobilier);
+            String message = "Votre demande est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
+            if (immobilier.getMail() != null) {
+                sendEmailService.sendEmailWithAttachment(immobilier.getMail(), "", message, "SUGUBA IMMOBILIER");
+                return Response.success(immobilierSaved, "Demande envoyée.");
+            }
+            return Response.success(immobilierSaved, "Demande envoyée.");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur d'enregistrement de la demande.");
+        }
     }
 
     public Map<String, Object> saveImmobilier(Immobilier immobilier) {

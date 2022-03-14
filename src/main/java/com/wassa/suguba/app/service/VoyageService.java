@@ -19,16 +19,22 @@ import java.util.Optional;
 public class VoyageService {
     private final VoyageRepository voyageRepository;
     private final UploadFileService uploadFileService;
+    private final SendEmailService sendEmailService;
 
-    public VoyageService(VoyageRepository voyageRepository, UploadFileService uploadFileService) {
+    public VoyageService(VoyageRepository voyageRepository, UploadFileService uploadFileService, SendEmailService sendEmailService) {
         this.voyageRepository = voyageRepository;
         this.uploadFileService = uploadFileService;
+        this.sendEmailService = sendEmailService;
     }
 
     public Map<String, Object> saveVoyage(Voyage voyage, MultipartFile photo) {
         try {
-            voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.VOYAGE_DOWNLOAD_LINK));
             Voyage voyageSaced = voyageRepository.save(voyage);
+            if (voyage.getMail() != null) {
+                String message = "Votre demande de voyage est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
+                sendEmailService.sendEmailWithAttachment(voyage.getMail(), voyage.getPrenom() + " " + voyage.getNom(), message, "DEMANDE VOYAGE");
+            }
             return Response.success(voyageSaced, "Voyage enregistrée.");
         } catch (Exception e) {
             return Response.error(e, "Erreur d'enregistrement de la voyage.");
@@ -39,7 +45,7 @@ public class VoyageService {
         try {
             Optional<Voyage> voyageOptional = voyageRepository.findById(voyage.getId());
             if (voyageOptional.isPresent()) {
-                voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.VOYAGE_DOWNLOAD_LINK));
                 Voyage voyageSaced = voyageRepository.save(voyage);
                 return Response.success(voyageSaced, "Voyage modifiée.");
             }

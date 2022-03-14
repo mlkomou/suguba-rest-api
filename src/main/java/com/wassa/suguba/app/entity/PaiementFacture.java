@@ -13,6 +13,24 @@ public class PaiementFacture extends Generality{
     private String numCompteur;
     private String formuleCanal;
     private String path;
+    private String typeFacture;
+    private Double montant;
+
+    public Double getMontant() {
+        return montant;
+    }
+
+    public void setMontant(Double montant) {
+        this.montant = montant;
+    }
+
+    public String getTypeFacture() {
+        return typeFacture;
+    }
+
+    public void setTypeFacture(String typeFacture) {
+        this.typeFacture = typeFacture;
+    }
 
     public String getPath() {
         return path;

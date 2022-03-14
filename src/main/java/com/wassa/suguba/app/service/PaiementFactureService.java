@@ -19,16 +19,37 @@ import java.util.Optional;
 public class PaiementFactureService {
     private final PaiementFactureRepository paiementFactureRepository;
     private final UploadFileService uploadFileService;
+    private final SendEmailService sendEmailService;
 
-    public PaiementFactureService(PaiementFactureRepository paiementFactureRepository, UploadFileService uploadFileService) {
+    public PaiementFactureService(PaiementFactureRepository paiementFactureRepository, UploadFileService uploadFileService, SendEmailService sendEmailService) {
         this.paiementFactureRepository = paiementFactureRepository;
         this.uploadFileService = uploadFileService;
+        this.sendEmailService = sendEmailService;
+    }
+
+    public Map<String, Object> savePaiementFactureWithoutFile(PaiementFacture paiementFacture) {
+        try {
+            PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
+            if (paiementFacture.getMail() != null) {
+                String message = "La demande de paiement de votre facture est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
+                sendEmailService.sendEmailWithAttachment(paiementFacture.getMail(), paiementFacture.getPrenom() + " " + paiementFacture.getNom(), message, "DEMANDE PAIEMENT FACTURE");
+                return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
+            }
+            return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur d'enregistrement de la paiementFacture.");
+        }
     }
 
     public Map<String, Object> savePaiementFacture(PaiementFacture paiementFacture, MultipartFile photo) {
         try {
-            paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.FACTURE_DOWNLOAD_LINK));
             PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
+            if (paiementFacture.getMail() != null) {
+                String message = "La demande de paiement de votre facture est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
+                sendEmailService.sendEmailWithAttachment(paiementFacture.getMail(), paiementFacture.getPrenom() + " " + paiementFacture.getNom(), message, "DEMANDE PAIEMENT FACTURE");
+                return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
+            }
             return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
         } catch (Exception e) {
             return Response.error(e, "Erreur d'enregistrement de la paiementFacture.");

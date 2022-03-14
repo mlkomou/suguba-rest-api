@@ -57,7 +57,7 @@ public class VoyageController {
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.CATEGORIE_DOWNLOAD_LINK;
+        String path = UploadPath.VOYAGE_DOWNLOAD_LINK;
         try {
             Path fileName = Paths.get(path, photo);
             byte[] buffer = Files.readAllBytes(fileName);

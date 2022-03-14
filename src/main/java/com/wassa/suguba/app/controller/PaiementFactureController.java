@@ -25,6 +25,11 @@ public class PaiementFactureController {
         this.paiementFactureService = paiementFactureService;
     }
 
+    @PostMapping("/without-file")
+    public Map<String, Object> savePaiementFactureWithoutFile(@RequestBody PaiementFacture paiementFacture)  {
+        return paiementFactureService.savePaiementFactureWithoutFile(paiementFacture);
+    }
+
     @PostMapping()
     public Map<String, Object> savePaiementFacture(@RequestParam("paiementFacture") String paiementFactureString,
                                           @RequestParam("photo") MultipartFile photo) throws JsonProcessingException {
@@ -57,7 +62,7 @@ public class PaiementFactureController {
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.CATEGORIE_DOWNLOAD_LINK;
+        String path = UploadPath.FACTURE_DOWNLOAD_LINK;
         try {
             Path fileName = Paths.get(path, photo);
             byte[] buffer = Files.readAllBytes(fileName);

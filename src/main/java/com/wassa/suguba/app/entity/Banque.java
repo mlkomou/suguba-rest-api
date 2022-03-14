@@ -8,10 +8,28 @@ import javax.persistence.Table;
 public class Banque extends Generality{
     private String prenom;
     private String nom;
+    private String phone;
+    private String mail;
     private String numPiece;
     private String moyenPret;
     private String path;
     private double montant;
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public String getPrenom() {
         return prenom;

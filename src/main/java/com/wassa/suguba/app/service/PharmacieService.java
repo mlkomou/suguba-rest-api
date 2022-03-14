@@ -27,11 +27,11 @@ public class PharmacieService {
 
     public Map<String, Object> savePharmacie(Pharmacie pharmacie, MultipartFile photo) {
         try {
-            pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.PHARMACIE_DOWNLOAD_LINK));
             Pharmacie pharmacieSaced = pharmacieRepository.save(pharmacie);
-            return Response.success(pharmacieSaced, "Pharmacie enregistrée.");
+            return Response.success(pharmacieSaced, "Ordonance envoyée avec succès.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la pharmacie.");
+            return Response.error(e, "Erreur d'enregistrement de l'ordonance.");
         }
     }
 
@@ -39,13 +39,13 @@ public class PharmacieService {
         try {
             Optional<Pharmacie> pharmacieOptional = pharmacieRepository.findById(pharmacie.getId());
             if (pharmacieOptional.isPresent()) {
-                pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.PHARMACIE_DOWNLOAD_LINK));
                 Pharmacie pharmacieSaced = pharmacieRepository.save(pharmacie);
-                return Response.success(pharmacieSaced, "Pharmacie modifiée.");
+                return Response.success(pharmacieSaced, "ordonance modifiée.");
             }
-            return Response.error(new HashMap<>(), "Cette Pharmacie n'existe pas.");
+            return Response.error(new HashMap<>(), "Cette ordonance n'existe pas.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la pharmacie.");
+            return Response.error(e, "Erreur d'enregistrement de l'ordonance.");
         }
     }
 
@@ -54,11 +54,11 @@ public class PharmacieService {
             Optional<Pharmacie> pharmacieOptional = pharmacieRepository.findById(pharmacie.getId());
             if (pharmacieOptional.isPresent()) {
                 Pharmacie pharmacieSaced = pharmacieRepository.save(pharmacie);
-                return Response.success(pharmacieSaced, "Pharmacie modifiée.");
+                return Response.success(pharmacieSaced, "ordonance modifiée.");
             }
-            return Response.error(new HashMap<>(), "Cette Pharmacie n'existe pas.");
+            return Response.error(new HashMap<>(), "Cette ordonance n'existe pas.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la pharmacie.");
+            return Response.error(e, "Erreur d'enregistrement de l'ordonance.");
         }
     }
 
@@ -66,7 +66,7 @@ public class PharmacieService {
         try {
             Pageable paging = PageRequest.of(page, size);
             Page<Pharmacie> pharmacies = pharmacieRepository.findAll(paging);
-            return Response.error(pharmacies, "Liste des pharmacies.");
+            return Response.error(pharmacies, "Liste des ordonances.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }
@@ -75,7 +75,7 @@ public class PharmacieService {
     public Map<String, Object> getPharmacies() {
         try {
             List<Pharmacie> pharmacies = pharmacieRepository.findAll();
-            return Response.success(pharmacies, "Liste des pharmacies.");
+            return Response.success(pharmacies, "Liste des ordonances.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }
