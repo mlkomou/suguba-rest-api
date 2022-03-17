@@ -33,7 +33,7 @@ public class ImmobilierService {
             Immobilier immobilierSaved = immobilierRepository.save(immobilier);
             String message = "Votre demande est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
             if (immobilier.getMail() != null) {
-                sendEmailService.sendEmailWithAttachment(immobilier.getMail(), "", message, "SUGUBA IMMOBILIER");
+//                sendEmailService.sendEmailWithAttachment(immobilier.getMail(), "", message, "SUGUBA IMMOBILIER");
                 return Response.success(immobilierSaved, "Demande envoyée.");
             }
             return Response.success(immobilierSaved, "Demande envoyée.");

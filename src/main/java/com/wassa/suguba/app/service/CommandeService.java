@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.*;
 
@@ -76,7 +77,7 @@ public class CommandeService {
             notificationService.saveNotification(notificationPayload, included_segments);
 
             if (client.getEmail() != null) {
-                sendEmailService.sendEmailWithAttachment(client.getEmail(), client.getNom(), message, "SUGUBA RECEPTION DE COMMANDE");
+                sendEmailService.sendEmailWithAttachment(client.getEmail(), client.getNom(), message, "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId());
                 return Response.success(commandeSaved, "Commande enregistrée.");
             }
           return Response.success(commandeSaved, "Commande enregistrée.");

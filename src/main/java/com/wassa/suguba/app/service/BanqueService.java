@@ -33,7 +33,7 @@ public class BanqueService {
             String message = "Votre demande de prêt est an cours de traitement. Nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA";
             Banque banqueSaced = banqueRepository.save(banque);
             if (banque.getMail() != null) {
-                sendEmailService.sendEmailWithAttachment(banque.getMail(), banque.getPrenom() + " " + banque.getNom(), message, "SUGUBA DEMANDE DE PRÊT");
+//                sendEmailService.sendEmailWithAttachment(banque.getMail(), banque.getPrenom() + " " + banque.getNom(), message, "SUGUBA DEMANDE DE PRÊT");
                 return Response.success(banqueSaced, "Demande de prêt envoyée.");
             }
             return Response.success(banqueSaced, "Demande de prêt envoyée.");
