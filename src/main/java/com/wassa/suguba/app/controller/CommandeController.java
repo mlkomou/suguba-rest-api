@@ -3,6 +3,7 @@ package com.wassa.suguba.app.controller;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Commande;
 import com.wassa.suguba.app.payload.CommandePayload;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.CommandeService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -29,6 +30,11 @@ public class CommandeController {
         return commandeService.saveCommande(commande);
     }
 
+    @PostMapping("/statut")
+    public Map<String, Object> updateStatut(@RequestBody UpdateStatut updateStatut) {
+        return commandeService.updateStatut(updateStatut);
+    }
+
     @PutMapping()
     public Map<String, Object> updateCommandeWithoutFile(@RequestBody Commande commande) {
         return commandeService.updateCommandeWithoutFile(commande);
@@ -40,7 +46,7 @@ public class CommandeController {
         return commandeService.getCommandes();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getCommandesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return commandeService.getCommandesByPage(page, size);
     }

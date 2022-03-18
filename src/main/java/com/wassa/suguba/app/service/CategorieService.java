@@ -65,7 +65,7 @@ public class CategorieService {
         try {
             Pageable paging = PageRequest.of(page, size);
             Page<Categorie> categories = categorieRepository.findAll(paging);
-            return Response.error(categories, "Liste des categories.");
+            return Response.success(categories, "Liste des categories.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
         }

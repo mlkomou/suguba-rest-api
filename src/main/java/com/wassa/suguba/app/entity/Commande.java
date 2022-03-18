@@ -12,7 +12,7 @@ public class Commande extends Generality{
     String numero;
     String adresse;
     String adressePath;
-    String statut;
+    String statut = "Traitement";
     String oneSignalNotificationId;
     String email;
     @ManyToOne

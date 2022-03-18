@@ -48,7 +48,7 @@ public class CategorieController {
         return categorieService.getCategories();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getCategoriesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return categorieService.getCategoriesByPage(page, size);
     }

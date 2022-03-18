@@ -6,6 +6,7 @@ import com.wassa.suguba.app.entity.LigneCommande;
 import com.wassa.suguba.app.entity.Produit;
 import com.wassa.suguba.app.payload.CommandePayload;
 import com.wassa.suguba.app.payload.NotificationPayload;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.repository.ClientRepository;
 import com.wassa.suguba.app.repository.CommandeRepository;
 import com.wassa.suguba.app.repository.LigneCommendeRepository;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -77,7 +79,7 @@ public class CommandeService {
             notificationService.saveNotification(notificationPayload, included_segments);
 
             if (client.getEmail() != null) {
-                sendEmailService.sendEmailWithAttachment(client.getEmail(), client.getNom(), message, "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId());
+                sendEmailService.sendEmailWithAttachment(client.getEmail(), "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId());
                 return Response.success(commandeSaved, "Commande enregistrée.");
             }
           return Response.success(commandeSaved, "Commande enregistrée.");
@@ -90,6 +92,22 @@ public class CommandeService {
         try {
             Optional<Commande> commandeOptional = commandeRepository.findById(commande.getId());
             if (commandeOptional.isPresent()) {
+                Commande commandeSaced = commandeRepository.save(commande);
+                return Response.success(commandeSaced, "Commande modifiée.");
+            }
+            return Response.error(new HashMap<>(), "Cette Commande n'existe pas.");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur d'enregistrement de la commande.");
+        }
+    }
+
+    public Map<String, Object> updateStatut(UpdateStatut updateStatut) {
+        try {
+            Optional<Commande> commandeOptional = commandeRepository.findById(updateStatut.getCommandeId());
+            if (commandeOptional.isPresent()) {
+                Commande commande = commandeOptional.get();
+                commande.setLastModifiedAt(LocalDateTime.now());
+                commande.setStatut(updateStatut.getStatut());
                 Commande commandeSaced = commandeRepository.save(commande);
                 return Response.success(commandeSaced, "Commande modifiée.");
             }
