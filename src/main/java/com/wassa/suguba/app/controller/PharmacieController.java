@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Pharmacie;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.PharmacieService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -49,9 +50,14 @@ public class PharmacieController {
         return pharmacieService.getPharmacies();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getPharmaciesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return pharmacieService.getPharmaciesByPage(page, size);
+    }
+
+    @PostMapping("/statut")
+    public Map<String, Object> updateStatut(@RequestBody UpdateStatut updateStatut) {
+        return pharmacieService.updateStatut(updateStatut);
     }
 
     @ResponseBody

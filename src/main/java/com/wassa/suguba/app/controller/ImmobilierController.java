@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Immobilier;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.ImmobilierService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -47,9 +48,13 @@ public class ImmobilierController {
         return immobilierService.getImmobiliers();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getImmobiliersByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return immobilierService.getImmobiliersByPage(page, size);
+    }
+    @PostMapping("/statut")
+    public Map<String, Object> updateStatut(@RequestBody UpdateStatut updateStatut) {
+        return immobilierService.updateStatut(updateStatut);
     }
 
     @ResponseBody

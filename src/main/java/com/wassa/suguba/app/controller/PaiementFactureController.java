@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.PaiementFacture;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.PaiementFactureService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -54,9 +55,13 @@ public class PaiementFactureController {
         return paiementFactureService.getPaiementFactures();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getPaiementFacturesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return paiementFactureService.getPaiementFacturesByPage(page, size);
+    }
+    @PostMapping("/statut")
+    public Map<String, Object> updateStatut(@RequestBody UpdateStatut updateStatut) {
+        return paiementFactureService.updateStatut(updateStatut);
     }
 
     @ResponseBody

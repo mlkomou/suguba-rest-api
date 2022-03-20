@@ -13,7 +13,16 @@ public class Immobilier extends Generality{
     private Double montantMin;
     private String phone;
     private String mail;
+    private String statut;
     private String path;
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public String getMail() {
         return mail;
@@ -78,4 +87,5 @@ public class Immobilier extends Generality{
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
 }

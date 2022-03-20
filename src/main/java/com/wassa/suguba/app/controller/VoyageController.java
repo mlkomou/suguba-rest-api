@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Voyage;
+import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.VoyageService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -49,9 +50,13 @@ public class VoyageController {
         return voyageService.getVoyages();
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Map<String, Object> getVoyagesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return voyageService.getVoyagesByPage(page, size);
+    }
+    @PostMapping("/statut")
+    public Map<String, Object> updateStatut(@RequestBody UpdateStatut updateStatut) {
+        return voyageService.updateStatut(updateStatut);
     }
 
     @ResponseBody

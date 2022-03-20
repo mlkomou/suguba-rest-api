@@ -13,8 +13,17 @@ public class PaiementFacture extends Generality{
     private String numCompteur;
     private String formuleCanal;
     private String path;
+    private String statut = "Traitement";
     private String typeFacture;
     private Double montant;
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public Double getMontant() {
         return montant;

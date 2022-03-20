@@ -8,6 +8,15 @@ import javax.persistence.Table;
 public class Pharmacie extends Generality {
     private String path;
     private String phone;
+    private String statut;
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public String getPath() {
         return path;

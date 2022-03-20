@@ -15,8 +15,17 @@ public class Voyage extends Generality {
    private String nom;
    private String prenom;
    private String phone;
+   private String statut;
    private String mail;
    private String path;
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public String getMoyenTransport() {
         return moyenTransport;

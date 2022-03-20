@@ -13,7 +13,16 @@ public class Banque extends Generality{
     private String numPiece;
     private String moyenPret;
     private String path;
+    private String statut;
     private double montant;
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
 
     public String getMail() {
         return mail;
