@@ -1,11 +1,7 @@
 package com.wassa.suguba.app.service;
 
-import com.wassa.suguba.app.entity.Banque;
-import com.wassa.suguba.app.entity.Immobilier;
-import com.wassa.suguba.app.entity.LigneCommande;
-import com.wassa.suguba.app.repository.BanqueRepository;
-import com.wassa.suguba.app.repository.ImmobilierRepository;
-import com.wassa.suguba.app.repository.LigneCommendeRepository;
+import com.wassa.suguba.app.entity.*;
+import com.wassa.suguba.app.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +17,10 @@ public class TableGenerationService {
     private BanqueRepository banqueRepository;
     @Autowired
     private ImmobilierRepository immobilierRepository;
+    @Autowired
+    private PaiementFactureRepository paiementFactureRepository;
+    @Autowired
+    private VoyageRepository voyageRepository;
 
     public String generateReportMessage(List<LigneCommande> ligneCommandes) {
         StringBuilder stringBuilder = generateCommonHtmlHead();
@@ -148,9 +148,91 @@ public class TableGenerationService {
         stringBuilder.append("</table></body>");
     }
 
-
     public String generateReportMessageImmobilier(Long idImmobilier) {
         Optional<Immobilier> immobilier = immobilierRepository.findById(idImmobilier);
         return generateReportMessageImmobilier(immobilier.get());
+    }
+
+
+    ///paimenent facture
+    public String generateReportMessagePaiement(PaiementFacture paiementFacture) {
+        StringBuilder stringBuilder = generateCommonHtmlHeadPaiement();
+
+        stringBuilder.append("<tbody>");
+        stringBuilder.append("<tr>");
+        stringBuilder.append("<td>").append(paiementFacture.getId()).append("</td>");
+        stringBuilder.append("<td>").append(paiementFacture.getTypeFacture()).append("</td>");
+        stringBuilder.append("<td>").append(paiementFacture.getMontant()).append("</td>");
+        stringBuilder.append("</tr>");
+        stringBuilder.append("</tbody>");
+        generateCommonFooterPaiement(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+
+    private StringBuilder generateCommonHtmlHeadPaiement() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        return stringBuilder.append("<head>")
+                .append("<h1>Paiement de facture<h1>")
+                .append("</head>")
+                .append("<body>")
+                .append("<table border=1 class=\"table\">")
+                .append("<thead>")
+                .append("<tr>")
+                .append("<th>Demande id</th><th>Type</th><th>Montant</th>")
+                .append("</tr>")
+                .append("</thead>");
+    }
+
+    private void generateCommonFooterPaiement(StringBuilder stringBuilder) {
+        stringBuilder.append("</table></body>");
+    }
+
+    public String generateReportMessagePaiement(Long idPaiement) {
+        Optional<PaiementFacture> immobilier = paiementFactureRepository.findById(idPaiement);
+        return generateReportMessagePaiement(immobilier.get());
+    }
+
+
+    ///voyage
+    public String generateReportMessageVoyage(Voyage voyage) {
+        StringBuilder stringBuilder = generateCommonHtmlHeadVoyage();
+
+        stringBuilder.append("<tbody>");
+        stringBuilder.append("<tr>");
+        stringBuilder.append("<td>").append(voyage.getId()).append("</td>");
+        stringBuilder.append("<td>").append(voyage.getTypeVoyage()).append("</td>");
+        stringBuilder.append("<td>").append(voyage.getDepart()).append("</td>");
+        stringBuilder.append("<td>").append(voyage.getDestination()).append("</td>");
+        stringBuilder.append("</tr>");
+        stringBuilder.append("</tbody>");
+        generateCommonFooterVoyage(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+
+    private StringBuilder generateCommonHtmlHeadVoyage() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        return stringBuilder.append("<head>")
+                .append("<h1>Demande de voyage<h1>")
+                .append("</head>")
+                .append("<body>")
+                .append("<table border=1 class=\"table\">")
+                .append("<thead>")
+                .append("<tr>")
+                .append("<th>Demande id</th><th>Type de voyage</th><th>Départ</th><th>Destination</th>")
+                .append("</tr>")
+                .append("</thead>");
+    }
+
+    private void generateCommonFooterVoyage(StringBuilder stringBuilder) {
+        stringBuilder.append("</table></body>");
+    }
+
+    public String generateReportMessageVoayage(Long idVoyage) {
+        Optional<Voyage> voyage = voyageRepository.findById(idVoyage);
+        return generateReportMessageVoyage(voyage.get());
     }
 }

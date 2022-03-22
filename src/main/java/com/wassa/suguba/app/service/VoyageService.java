@@ -36,7 +36,7 @@ public class VoyageService {
             Voyage voyageSaced = voyageRepository.save(voyage);
             if (voyage.getMail() != null) {
                 String message = "Votre demande de voyage est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
-//                sendEmailService.sendEmailWithAttachment(voyage.getMail(), voyage.getPrenom() + " " + voyage.getNom(), message, "DEMANDE VOYAGE");
+                sendEmailService.sendEmailVoyage(voyage.getMail(), "DEMANDE VOYAGE", voyageSaced.getId());
             }
             return Response.success(voyageSaced, "Voyage enregistrée.");
         } catch (Exception e) {

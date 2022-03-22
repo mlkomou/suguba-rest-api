@@ -1,11 +1,7 @@
 package com.wassa.suguba.app.service;
 
-import com.wassa.suguba.app.entity.Banque;
-import com.wassa.suguba.app.entity.Commande;
-import com.wassa.suguba.app.entity.Immobilier;
-import com.wassa.suguba.app.repository.BanqueRepository;
-import com.wassa.suguba.app.repository.CommandeRepository;
-import com.wassa.suguba.app.repository.ImmobilierRepository;
+import com.wassa.suguba.app.entity.*;
+import com.wassa.suguba.app.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,13 +19,17 @@ public class SendEmailService {
     private final FormatMailService formatMailService;
     private final BanqueRepository banqueRepository;
     private final ImmobilierRepository immobilierRepository;
+    private final PaiementFactureRepository paiementFactureRepository;
+    private final VoyageRepository voyageRepository;
 
-    public SendEmailService(TableGenerationService tableGenerationService, CommandeRepository commandeRepository, FormatMailService formatMailService, BanqueRepository banqueRepository, ImmobilierRepository immobilierRepository) {
+    public SendEmailService(TableGenerationService tableGenerationService, CommandeRepository commandeRepository, FormatMailService formatMailService, BanqueRepository banqueRepository, ImmobilierRepository immobilierRepository, PaiementFactureRepository paiementFactureRepository, VoyageRepository voyageRepository) {
         this.banqueRepository = banqueRepository;
         this.tableGenerationService = tableGenerationService;
         this.commandeRepository = commandeRepository;
         this.formatMailService = formatMailService;
         this.immobilierRepository = immobilierRepository;
+        this.paiementFactureRepository = paiementFactureRepository;
+        this.voyageRepository = voyageRepository;
     }
 
     public void sendEmailWithAttachment(String mail, String objet, Long commandId) {
@@ -69,6 +69,38 @@ public class SendEmailService {
             Optional<Immobilier> immobilier = immobilierRepository.findById(immobilierId);
             MimeMessage msg = javaMailSender.createMimeMessage();
             String messageFormated = formatMailService.formatEmail(tableGenerationService.generateReportMessageImmobilier(immobilierId), immobilier.get().getMail(), immobilierId);
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+            helper.setTo(mail);
+            helper.setSubject(objet);
+            helper.setText(messageFormated, true);
+            javaMailSender.send(msg);
+
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    public void sendEmailPaiement(String mail, String objet, Long paiementId) {
+        try {
+            Optional<PaiementFacture> paiementFacture = paiementFactureRepository.findById(paiementId);
+            MimeMessage msg = javaMailSender.createMimeMessage();
+            String messageFormated = formatMailService.formatEmail(tableGenerationService.generateReportMessagePaiement(paiementId), paiementFacture.get().getPrenom() + " " + paiementFacture.get().getPrenom(), paiementId);
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+            helper.setTo(mail);
+            helper.setSubject(objet);
+            helper.setText(messageFormated, true);
+            javaMailSender.send(msg);
+
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    public void sendEmailVoyage(String mail, String objet, Long vouyageId) {
+        try {
+            Optional<Voyage> voyage = voyageRepository.findById(vouyageId);
+            MimeMessage msg = javaMailSender.createMimeMessage();
+            String messageFormated = formatMailService.formatEmail(tableGenerationService.generateReportMessageVoayage(vouyageId), voyage.get().getPrenom() + " " + voyage.get().getPrenom(), vouyageId);
             MimeMessageHelper helper = new MimeMessageHelper(msg, true);
             helper.setTo(mail);
             helper.setSubject(objet);

@@ -35,7 +35,7 @@ public class PaiementFactureService {
             PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
             if (paiementFacture.getMail() != null) {
                 String message = "La demande de paiement de votre facture est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
-//                sendEmailService.sendEmailWithAttachment(paiementFacture.getMail(), paiementFacture.getPrenom() + " " + paiementFacture.getNom(), message, "DEMANDE PAIEMENT FACTURE");
+                sendEmailService.sendEmailPaiement(paiementFacture.getMail(),  "DEMANDE PAIEMENT FACTURE", paiementFactureSaced.getId());
                 return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
             }
             return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
@@ -50,7 +50,9 @@ public class PaiementFactureService {
             PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
             if (paiementFacture.getMail() != null) {
                 String message = "La demande de paiement de votre facture est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
-//                sendEmailService.sendEmailWithAttachment(paiementFacture.getMail(), paiementFacture.getPrenom() + " " + paiementFacture.getNom(), message, "DEMANDE PAIEMENT FACTURE");
+                System.out.println("sending mail");
+                sendEmailService.sendEmailPaiement(paiementFacture.getMail(),  "DEMANDE PAIEMENT FACTURE", paiementFactureSaced.getId());
+                System.out.println("mail sent");
                 return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");
             }
             return Response.success(paiementFactureSaced, "PaiementFacture enregistrée.");

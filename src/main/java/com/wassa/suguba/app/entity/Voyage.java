@@ -15,7 +15,7 @@ public class Voyage extends Generality {
    private String nom;
    private String prenom;
    private String phone;
-   private String statut;
+   private String statut = "Traitement";
    private String mail;
    private String path;
 

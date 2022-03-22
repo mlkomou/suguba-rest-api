@@ -8,7 +8,7 @@ import javax.persistence.Table;
 public class Pharmacie extends Generality {
     private String path;
     private String phone;
-    private String statut;
+    private String statut = "Traitement";
 
     public String getStatut() {
         return statut;
