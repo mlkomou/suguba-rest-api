@@ -2,11 +2,15 @@ package com.wassa.suguba.app.service;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Service
 public class FormatMailService {
-    String formatEmail(String arrayList, String name, Long itemId) {
+    String formatEmail(String arrayList, String name, Long itemId, String phone, String message) {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, yyyy", Locale.FRENCH);
+        final String today = LocalDate.now().format(formatter);
         return "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -132,20 +136,18 @@ public class FormatMailService {
                 "\t\t\t\t\t\t\t<div class=\"row\">\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-6\">\n" +
                 "\t\t\t\t\t\t\t\t\t<div class=\"invoice-top-left\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h2 class=\"client-company-name\">SUGUBA.</h2>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h6 class=\"client-address\">Bamako, <br>Delaware, AC 987869 <br>Mali</h6>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h4>Reference</h4>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h5>Commerce et assistance de service &amp;</h5>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<h2 class=\"client-company-name\">SUGUBA SA</h2>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<h6 class=\"client-address\"><br>" + "Sotuba ACI, près du stade Malien\n <br>" + "Tel : +223 78 99 19 27 / 65 28 30 72\n" +
                 "\t\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-6\">\n" +
                 "\t\t\t\t\t\t\t\t\t<div class=\"invoice-top-right\">\n" +
                 "\t\t\t\t\t\t\t\t\t\t<h2 class=\"our-company-name\">"+name+"</h2>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h6 class=\"our-address\">477 Blackwell Street, <br>Dry Creek, Alaska <br>India</h6>\n" +
+                "<h2 class=\"our-company-name\"> Tel: " +phone+" </h2>\n" +
                 "\t\t\t\t\t\t\t\t\t\t<div class=\"logo-wrapper\">\n" +
                 "\t\t\t\t\t\t\t\t\t\t\t<img style=\"width: 100px; height: 100px;\" src=\"https://electionuniverse.org:8443/suguba/commandes/logo/icon.png\" class=\"img-responsive pull-right logo\" />\n" +
                 "\t\t\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h5>06 September 2017</h5>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<h5>"+today+"</h5>\n" +
                 "\t\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t</div>\n" +
@@ -160,47 +162,14 @@ public class FormatMailService {
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-3 col-md-3\">\n" +
                 "\t\t\t\t\t\t\t\t\t<div class=\"invoice-bottom-left\">\n" +
                 "\t\t\t\t\t\t\t\t\t\t<h5>Facture No.</h5>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h4>"+itemId+"</h4>\n" +
+                "\t\t\t\t\t\t\t\t\t\t<h4>"+itemId+"</h4>\n" + "</br>" +
                 "\t\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-md-offset-1 col-md-8 col-sm-9\">\n" +
                 "\t\t\t\t\t\t\t\t\t<div class=\"invoice-bottom-right\">\n" +
                 "\t\t\t\t\t\t\t\t\t\t"+arrayList+"\n" +
-                "\t\t\t\t\t\t\t\t\t\t<!-- <table class=\"table\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<thead>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t</thead>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<tbody>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>1</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>Initial research</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>₹10,000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>1</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>UX design</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>₹35,000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>1</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>Web app development</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<td>₹50,000</td>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr style=\"height: 40px;\"></tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t</tbody>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<thead>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<th>Total</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<th></th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t\t<th>₹95,000</th>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t</thead>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</table> -->\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h4 class=\"terms\">Terms</h4>\n" +
+                "<div> "+message+" </div>" +
                 "\t\t\t\t\t\t\t\t\t\t<ul>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<li>Commande payée à la livraison.</li>\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<!-- <li>Make payment in 2,3 business days.</li> -->\n" +
                 "\t\t\t\t\t\t\t\t\t\t</ul>\n" +
                 "\t\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
@@ -209,16 +178,12 @@ public class FormatMailService {
                 "\t\t\t\t\t\t\t\t\t<hr class=\"divider\">\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-4\">\n" +
-                "\t\t\t\t\t\t\t\t\t<h6 class=\"text-left\">acme.com</h6>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-4\">\n" +
-                "\t\t\t\t\t\t\t\t\t<h6 class=\"text-center\">contact@acme.com</h6>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t\t<div class=\"col-sm-4\">\n" +
-                "\t\t\t\t\t\t\t\t\t<h6 class=\"text-right\">+91 8097678988</h6>\n" +
                 "\t\t\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t<div class=\"bottom-bar\"></div>\n" +
                 "\t\t\t\t\t\t</div>\n" +
                 "\t\t\t\t\t</div>\n" +
                 "\t\t\t\t</div>\n" +

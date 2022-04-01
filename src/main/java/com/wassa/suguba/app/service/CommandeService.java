@@ -18,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -43,7 +45,6 @@ public class CommandeService {
     public Map<String, Object> saveCommande(CommandePayload commandePayload) {
       try {
           NotificationPayload notificationPayload = new NotificationPayload();
-          String message = "Votre commande est en cours de traitement, nous vous contacterons pour la livraison. Merci d'avoir choisi SUGUBA.";
             List<LigneCommande> ligneArray = new ArrayList();
             List<String> included_segments = new ArrayList<>();
             included_segments.add(commandePayload.getOneSignalNotificationId());
@@ -79,7 +80,10 @@ public class CommandeService {
             notificationService.saveNotification(notificationPayload, included_segments);
 
             if (client.getEmail() != null) {
-                sendEmailService.sendEmailWithAttachment(client.getEmail(), "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId());
+                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, yyyy", Locale.FRENCH);
+                final String today = LocalDate.now().format(formatter);
+                String message = "Cher(e) " + commandeSaved.getClient().getNom() + ".\n" + "Merci de faire vos achats sur SUGUBA.\n" + "Votre commande du " + today + ", référence " + commandeSaved.getId() + "a été reçu";
+                sendEmailService.sendEmailWithAttachment(client.getEmail(), "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId(), commandeSaved.getClient().getPhone(), message);
                 return Response.success(commandeSaved, "Commande enregistrée.");
             }
           return Response.success(commandeSaved, "Commande enregistrée.");

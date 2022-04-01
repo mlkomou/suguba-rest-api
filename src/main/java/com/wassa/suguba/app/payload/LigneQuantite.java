@@ -19,4 +19,6 @@ public class LigneQuantite {
     public void setQuantite(Integer quantite) {
         this.quantite = quantite;
     }
+
+
 }

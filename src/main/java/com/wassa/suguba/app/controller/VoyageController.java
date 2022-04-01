@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Voyage;
+import com.wassa.suguba.app.payload.AeroportPayload;
+import com.wassa.suguba.app.payload.AreroprtFinal;
 import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.VoyageService;
 import org.springframework.core.io.ByteArrayResource;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -59,6 +62,14 @@ public class VoyageController {
         return voyageService.updateStatut(updateStatut);
     }
 
+    @PostMapping("/aeroport")
+    public Map<String, Object> saveAirport(@RequestBody List<AeroportPayload> areroprtFinals) {
+        return voyageService.saveAeroport(areroprtFinals);
+    }
+    @GetMapping("/aeroport/liste")
+    public Map<String, Object> getAllAirport() {
+        return voyageService.getAirports();
+    }
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {

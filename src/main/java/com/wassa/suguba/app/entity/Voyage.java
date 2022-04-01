@@ -1,16 +1,21 @@
 package com.wassa.suguba.app.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "voyage")
 public class Voyage extends Generality {
-   private String moyenTransport;
+   private String trajet;
    private String typeVoyage;
-   private String depart;
+//   private String depart;
+    @ManyToOne
+    private Aeroport depart;
+    @ManyToOne
+    private Aeroport destination;
    private String dateDepart;
-   private String destination;
+//   private String destination;
    private String dateRetour;
    private String nom;
    private String prenom;
@@ -27,12 +32,12 @@ public class Voyage extends Generality {
         this.statut = statut;
     }
 
-    public String getMoyenTransport() {
-        return moyenTransport;
+    public String getTrajet() {
+        return trajet;
     }
 
-    public void setMoyenTransport(String moyenTransport) {
-        this.moyenTransport = moyenTransport;
+    public void setTrajet(String trajet) {
+        this.trajet = trajet;
     }
 
     public String getTypeVoyage() {
@@ -43,12 +48,20 @@ public class Voyage extends Generality {
         this.typeVoyage = typeVoyage;
     }
 
-    public String getDepart() {
+    public Aeroport getDepart() {
         return depart;
     }
 
-    public void setDepart(String depart) {
+    public void setDepart(Aeroport depart) {
         this.depart = depart;
+    }
+
+    public Aeroport getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Aeroport destination) {
+        this.destination = destination;
     }
 
     public String getDateDepart() {
@@ -59,13 +72,6 @@ public class Voyage extends Generality {
         this.dateDepart = dateDepart;
     }
 
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
 
     public String getDateRetour() {
         return dateRetour;

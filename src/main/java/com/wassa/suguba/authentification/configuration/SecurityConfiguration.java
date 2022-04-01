@@ -50,7 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         DOWNLOAD_VOYAGE,
                         DOWNLOAD_PAIEMENTFACTURE,
                         DOWNLOAD_IMMOBILIER,
-                        BANQUE_IMMOBILIER).permitAll()
+                        BANQUE_IMMOBILIER,
+                        AEROPORT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager()))

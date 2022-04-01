@@ -1,9 +1,15 @@
 package com.wassa.suguba.app.service;
 
 import com.wassa.suguba.app.constante.UploadPath;
-import com.wassa.suguba.app.entity.Pharmacie;
+import com.wassa.suguba.app.entity.Aeroport;
+import com.wassa.suguba.app.entity.City;
+import com.wassa.suguba.app.entity.Country;
 import com.wassa.suguba.app.entity.Voyage;
+import com.wassa.suguba.app.payload.AeroportPayload;
 import com.wassa.suguba.app.payload.UpdateStatut;
+import com.wassa.suguba.app.repository.AeroportRepository;
+import com.wassa.suguba.app.repository.CityRepository;
+import com.wassa.suguba.app.repository.CountryRepository;
 import com.wassa.suguba.app.repository.VoyageRepository;
 import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
@@ -17,17 +23,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class VoyageService {
     private final VoyageRepository voyageRepository;
     private final UploadFileService uploadFileService;
     private final SendEmailService sendEmailService;
+    private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
+    private final AeroportRepository aeroportRepository;
 
-    public VoyageService(VoyageRepository voyageRepository, UploadFileService uploadFileService, SendEmailService sendEmailService) {
+    public VoyageService(VoyageRepository voyageRepository, UploadFileService uploadFileService, SendEmailService sendEmailService, CountryRepository countryRepository, CityRepository cityRepository, AeroportRepository aeroportRepository) {
         this.voyageRepository = voyageRepository;
         this.uploadFileService = uploadFileService;
         this.sendEmailService = sendEmailService;
+        this.countryRepository = countryRepository;
+        this.cityRepository = cityRepository;
+        this.aeroportRepository = aeroportRepository;
     }
 
     public Map<String, Object> saveVoyage(Voyage voyage, MultipartFile photo) {
@@ -36,7 +49,7 @@ public class VoyageService {
             Voyage voyageSaced = voyageRepository.save(voyage);
             if (voyage.getMail() != null) {
                 String message = "Votre demande de voyage est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
-                sendEmailService.sendEmailVoyage(voyage.getMail(), "DEMANDE VOYAGE", voyageSaced.getId());
+                sendEmailService.sendEmailVoyage(voyage.getMail(), "DEMANDE VOYAGE", voyageSaced.getId(), voyageSaced.getPhone(), message);
             }
             return Response.success(voyageSaced, "Voyage enregistrée.");
         } catch (Exception e) {
@@ -102,6 +115,103 @@ public class VoyageService {
             return Response.success(voyages, "Liste des voyages.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
+        }
+    }
+    public Map<String, Object> saveAeroport(List<AeroportPayload> areroprtFinals) {
+        System.err.println("airport length: " + areroprtFinals.size());
+        try {
+            AtomicReference<Aeroport> aeroportFinalSaved = new AtomicReference<>(new Aeroport());
+            areroprtFinals.forEach(areroprtFinal -> {
+                Optional<Country> countryOptional = countryRepository.findByNameEn(areroprtFinal.getCity().getCountry().getNameEn());
+                if (countryOptional.isPresent()) {
+//                    Country country = countryOptional.get();
+                    Optional<City> cityOptional = cityRepository.findByNameEn(areroprtFinal.getCity().getNameEn());
+                    if (cityOptional.isPresent()) {
+                        Optional<Aeroport> aeroportOptional = aeroportRepository.findByNameEn(areroprtFinal.getNameEn());
+                        if (aeroportOptional.isPresent()) {
+                            // airport is present
+                            //do nothing
+                        } else {
+                            Aeroport aeroport = new Aeroport();
+                            aeroport.setActive(areroprtFinal.getActive());
+                            aeroport.setCity(cityOptional.get());
+                            aeroport.setAcceptingComplaints(areroprtFinal.getAcceptingComplaints());
+                            aeroport.setElevationFeet(areroprtFinal.getElevationFeet());
+                            aeroport.setIata(areroprtFinal.getIata());
+                            aeroport.setLatitude(areroprtFinal.getLatitude());
+                            aeroport.setLongitude(areroprtFinal.getLongitude());
+                            aeroport.setNameEn(areroprtFinal.getNameEn());
+                            aeroport.setWebsite(areroprtFinal.getWebsite());
+                            aeroport.setNameFr(areroprtFinal.getNameFr());
+                            aeroport.setWikipediaLink(areroprtFinal.getWikipediaLink());
+                            Aeroport aeroportSaved = aeroportRepository.save(aeroport);
+                            aeroportFinalSaved.set(aeroportSaved);
+
+                        }
+                    } else {
+                        City city = new City();
+                        Aeroport aeroport = new Aeroport();
+                        city.setCountry(countryOptional.get());
+                        city.setNameEn(areroprtFinal.getCity().getNameEn());
+                        city.setNameFr(areroprtFinal.getCity().getNameFr());
+                        City citySaved = cityRepository.save(city);
+
+                        aeroport.setActive(areroprtFinal.getActive());
+                        aeroport.setCity(citySaved);
+                        aeroport.setAcceptingComplaints(areroprtFinal.getAcceptingComplaints());
+                        aeroport.setElevationFeet(areroprtFinal.getElevationFeet());
+                        aeroport.setIata(areroprtFinal.getIata());
+                        aeroport.setLatitude(areroprtFinal.getLatitude());
+                        aeroport.setLongitude(areroprtFinal.getLongitude());
+                        aeroport.setNameEn(areroprtFinal.getNameEn());
+                        aeroport.setWebsite(areroprtFinal.getWebsite());
+                        aeroport.setNameFr(areroprtFinal.getNameFr());
+                        aeroport.setWikipediaLink(areroprtFinal.getWikipediaLink());
+                        Aeroport aeroportSaved = aeroportRepository.save(aeroport);
+                        aeroportFinalSaved.set(aeroportSaved);
+
+                    }
+                } else {
+                    Country country = new Country();
+                    country.setNameEn(areroprtFinal.getCity().getCountry().getNameEn());
+                    country.setNameFr(areroprtFinal.getCity().getCountry().getNameFr());
+                    Country countrySaved = countryRepository.save(country);
+
+                    City city = new City();
+                    Aeroport aeroport = new Aeroport();
+                    city.setCountry(countrySaved);
+                    city.setNameEn(areroprtFinal.getCity().getNameEn());
+                    city.setNameFr(areroprtFinal.getCity().getNameFr());
+                    City citySaved = cityRepository.save(city);
+
+                    aeroport.setActive(areroprtFinal.getActive());
+                    aeroport.setCity(citySaved);
+                    aeroport.setAcceptingComplaints(areroprtFinal.getAcceptingComplaints());
+                    aeroport.setElevationFeet(areroprtFinal.getElevationFeet());
+                    aeroport.setIata(areroprtFinal.getIata());
+                    aeroport.setLatitude(areroprtFinal.getLatitude());
+                    aeroport.setLongitude(areroprtFinal.getLongitude());
+                    aeroport.setNameEn(areroprtFinal.getNameEn());
+                    aeroport.setWebsite(areroprtFinal.getWebsite());
+                    aeroport.setNameFr(areroprtFinal.getNameFr());
+                    aeroport.setWikipediaLink(areroprtFinal.getWikipediaLink());
+                   Aeroport aeroportSaved = aeroportRepository.save(aeroport);
+                    aeroportFinalSaved.set(aeroportSaved);
+                }
+            });
+            return Response.success(aeroportFinalSaved, "Aéroport enregistré");
+        } catch (Exception e) {
+            System.err.println(e);
+            return Response.error(e, "Erreur d'enregistrement de l'aéroport");
+        }
+    }
+
+    public Map<String, Object> getAirports() {
+        try {
+            List<Aeroport> aeroports = aeroportRepository.findAll();
+          return  Response.success(aeroports, "Liste des aéroprts");
+        } catch (Exception e) {
+          return   Response.error(e, "Erreur de récuperation");
         }
     }
 }

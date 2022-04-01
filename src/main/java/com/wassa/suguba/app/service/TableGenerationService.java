@@ -31,6 +31,7 @@ public class TableGenerationService {
             stringBuilder.append("<tr>");
             stringBuilder.append("<td>").append(ligneCommande.getId()).append("</td>");
             stringBuilder.append("<td>").append(ligneCommande.getProduit().getName()).append("</td>");
+            stringBuilder.append("<td>").append(ligneCommande.getProduit().getPrix()).append(" FCFA</td>");
             stringBuilder.append("<td>").append(ligneCommande.getQuantite()).append("</td>");
             stringBuilder.append("<td>").append(ligneCommande.getQuantite() * ligneCommande.getProduit().getPrix()).append(" FCFA </td>");
             stringBuilder.append("</tr>");
@@ -51,7 +52,7 @@ public class TableGenerationService {
                 .append("<table border=1 class=\"table\">")
                 .append("<thead>")
                 .append("<tr>")
-                .append("<th>Ligne commande id</th><th>Libéllé</th><th>Quantité</th><th>Prix</th>")
+                .append("<th>Ligne commande id</th><th>Article</th><th>Prix unitaire</th><th>Quantité</th><th>Prix total</th>")
                 .append("</tr>")
                 .append("</thead>");
     }
@@ -162,7 +163,7 @@ public class TableGenerationService {
         stringBuilder.append("<tr>");
         stringBuilder.append("<td>").append(paiementFacture.getId()).append("</td>");
         stringBuilder.append("<td>").append(paiementFacture.getTypeFacture()).append("</td>");
-        stringBuilder.append("<td>").append(paiementFacture.getMontant()).append("</td>");
+        stringBuilder.append("<td>").append(paiementFacture.getMontant()).append(" FCFA</td>");
         stringBuilder.append("</tr>");
         stringBuilder.append("</tbody>");
         generateCommonFooterPaiement(stringBuilder);

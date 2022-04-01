@@ -9,6 +9,7 @@ import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,7 +68,8 @@ public class ProduitService {
 
     public Map<String, Object> getProduitsByPage(int page, int size) {
         try {
-            Pageable paging = PageRequest.of(page, size);
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
             Page<Produit> produits = produitRepository.findAll(paging);
             return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {

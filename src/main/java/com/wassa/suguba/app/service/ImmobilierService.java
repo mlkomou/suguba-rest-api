@@ -33,9 +33,9 @@ public class ImmobilierService {
         try {
             immobilier.setPath(uploadFileService.uploadFile(photo, UploadPath.IMMOBILIER_DOWNLOAD_LINK));
             Immobilier immobilierSaved = immobilierRepository.save(immobilier);
-            String message = "Votre demande est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
             if (immobilier.getMail() != null) {
-                sendEmailService.sendEmailImmobilier(immobilier.getMail(), "SUGUBA IMMOBILIER", immobilierSaved.getId());
+                String message = "Votre demande est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
+                sendEmailService.sendEmailImmobilier(immobilier.getMail(), "SUGUBA IMMOBILIER", immobilierSaved.getId(), immobilierSaved.getPhone(), message);
                 return Response.success(immobilierSaved, "Demande envoyée.");
             }
             return Response.success(immobilierSaved, "Demande envoyée.");

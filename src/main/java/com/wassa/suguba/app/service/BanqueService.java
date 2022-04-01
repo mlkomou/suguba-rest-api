@@ -33,11 +33,10 @@ public class BanqueService {
     public Map<String, Object> saveBanque(Banque banque, MultipartFile photo) {
         try {
             banque.setPath(uploadFileService.uploadFile(photo, UploadPath.BANQUE_DOWNLOAD_LINK));
-            String message = "Votre demande de prêt est an cours de traitement. Nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA";
             Banque banqueSaced = banqueRepository.save(banque);
             if (banque.getMail() != null) {
-                sendEmailService.sendEmailBanque(banque.getMail(), "DEMANDE DE PRÊT", banqueSaced.getId());
-//                sendEmailService.sendEmailWithAttachment(banque.getMail(), banque.getPrenom() + " " + banque.getNom(), message, "SUGUBA DEMANDE DE PRÊT");
+                String message = "Cher(e) "+banqueSaced.getPrenom()+ " "+banqueSaced.getNom()+", Votre demande de prêt est an cours de traitement. Nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA";
+                sendEmailService.sendEmailBanque(banque.getMail(), "DEMANDE DE PRÊT", banqueSaced.getId(), banqueSaced.getPhone(), message);
                 return Response.success(banqueSaced, "Demande de prêt envoyée.");
             }
             return Response.success(banqueSaced, "Demande de prêt envoyée.");
