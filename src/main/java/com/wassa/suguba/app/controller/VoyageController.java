@@ -66,9 +66,15 @@ public class VoyageController {
     public Map<String, Object> saveAirport(@RequestBody List<AeroportPayload> areroprtFinals) {
         return voyageService.saveAeroport(areroprtFinals);
     }
-    @GetMapping("/aeroport/liste")
-    public Map<String, Object> getAllAirport() {
-        return voyageService.getAirports();
+    @PostMapping("/aeroport/liste")
+    public Map<String, Object> getAllAirport(@RequestParam("page") int page, @RequestParam("size") int size) {
+        return voyageService.getAirports(page, size);
+    }
+
+    @GetMapping("/aeroport/search/{term}")
+    public Map<String, Object> searchAirport(
+                                             @PathVariable String term) {
+        return voyageService.searchAirports(term);
     }
     @ResponseBody
     @GetMapping("/download/{photo}")

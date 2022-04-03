@@ -15,6 +15,7 @@ import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -206,12 +207,25 @@ public class VoyageService {
         }
     }
 
-    public Map<String, Object> getAirports() {
+    public Map<String, Object> getAirports(int page, int size) {
         try {
-            List<Aeroport> aeroports = aeroportRepository.findAll();
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
+            Page<Aeroport> aeroports = aeroportRepository.findAll(paging);
           return  Response.success(aeroports, "Liste des aéroprts");
         } catch (Exception e) {
           return   Response.error(e, "Erreur de récuperation");
+        }
+    }
+
+    public Map<String, Object> searchAirports(String terme) {
+        try {
+//            Pageable paging = PageRequest.of(page, size);
+            List<Aeroport> aeroports = aeroportRepository.realtimeSearch(terme);
+            return  Response.success(aeroports, "Liste des aéroprts");
+        } catch (Exception e) {
+            System.err.println(e);
+            return  Response.error(e, "Erreur de récuperation");
         }
     }
 }
