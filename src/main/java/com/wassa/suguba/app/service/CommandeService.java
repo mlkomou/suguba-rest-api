@@ -15,6 +15,7 @@ import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -123,7 +124,8 @@ public class CommandeService {
 
     public Map<String, Object> getCommandesByPage(int page, int size) {
         try {
-            Pageable paging = PageRequest.of(page, size);
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
             Page<Commande> commandes = commandeRepository.findAll(paging);
             return Response.success(commandes, "Liste des commandes.");
         } catch (Exception e) {
@@ -137,6 +139,20 @@ public class CommandeService {
             return Response.success(commandes, "Liste des commandes.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
+        }
+    }
+
+    public Map<String, Object> getCommandeById(Long id) {
+        try {
+            List<Commande> commandes = commandeRepository.findAllById(id);
+//            Optional<Commande> commandeOptional = commandeRepository.findById(id);
+            if (!commandes.isEmpty()) {
+                return Response.success(commandes, "commande trouvée.");
+            } else {
+                return Response.error(new ArrayList<>(), "Cette commande n'existe pas.");
+            }
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de la récuperation de commande.");
         }
     }
 }

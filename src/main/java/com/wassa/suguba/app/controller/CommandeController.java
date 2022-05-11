@@ -46,6 +46,11 @@ public class CommandeController {
         return commandeService.getCommandes();
     }
 
+    @GetMapping("/id/{id}")
+    public Map<String, Object> getCommandeById(@PathVariable Long id) {
+        return commandeService.getCommandeById(id);
+    }
+
     @PostMapping("/page")
     public Map<String, Object> getCommandesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return commandeService.getCommandesByPage(page, size);

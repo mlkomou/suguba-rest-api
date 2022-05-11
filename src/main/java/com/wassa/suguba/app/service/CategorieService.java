@@ -30,6 +30,7 @@ public class CategorieService {
             Categorie categorieSaced = categorieRepository.save(categorie);
             return Response.success(categorieSaced, "Categorie enregistrée.");
         } catch (Exception e) {
+            System.err.println(e);
             return Response.error(e, "Erreur d'enregistrement de la categorie.");
         }
     }

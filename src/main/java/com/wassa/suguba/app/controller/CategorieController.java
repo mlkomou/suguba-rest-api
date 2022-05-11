@@ -66,6 +66,7 @@ public class CategorieController {
                     .contentType(MediaType.parseMediaType("image/png"))
                     .body(byteArrayResource);
         } catch (Exception e) {
+            System.err.println(e);
             // TODO: handle exception
         }
         return ResponseEntity.badRequest().build();

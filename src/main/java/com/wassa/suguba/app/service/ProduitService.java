@@ -34,16 +34,19 @@ public class ProduitService {
 
     public Map<String, Object> saveProduit(Produit produit, List<MultipartFile> files) {
         try {
+            System.err.println("file size: " + files.size());
             Produit produitSaved = produitRepository.save(produit);
             files.forEach(multipartFile -> {
-                Files files1 = new Files();
                 try {
+                    System.err.println("filename: " + multipartFile.getOriginalFilename());
+                    Files files1 = new Files();
                     files1.setProduit(produitSaved);
                     files1.setPath(uploadFileService.uploadFile(multipartFile, UploadPath.PRODUIT_DOWNLOAD_LINK));
                     files1.setName(multipartFile.getOriginalFilename());
                     files1.setType(multipartFile.getContentType());
                     filesRepository.save(files1);
                 } catch (IOException e) {
+                    System.err.println(e);
                     e.printStackTrace();
                 }
             });
