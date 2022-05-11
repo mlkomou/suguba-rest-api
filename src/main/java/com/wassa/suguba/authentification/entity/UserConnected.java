@@ -2,9 +2,17 @@ package com.wassa.suguba.authentification.entity;
 
 
 public class UserConnected {
-    String username;
     String token;
     ApplicationUser applicationUser;
+    Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public ApplicationUser getApplicationUser() {
         return applicationUser;
@@ -12,14 +20,6 @@ public class UserConnected {
 
     public void setApplicationUser(ApplicationUser applicationUser) {
         this.applicationUser = applicationUser;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getToken() {

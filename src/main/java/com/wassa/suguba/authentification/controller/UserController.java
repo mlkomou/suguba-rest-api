@@ -35,9 +35,19 @@ public class UserController {
         return authService.loginUser(user);
     }
 
+    @PostMapping("/create")
+    Map<String, Object> createUser(@RequestBody ApplicationUser user) {
+        return authService.createUser(user);
+    }
+
     @PostMapping("/user-phone")
     public ResponseEntity<Map<String, Object>> signupMobile(@RequestParam("oneSignalUserId") String oneSignalUserId) {
         return authService.signupMobileUser(oneSignalUserId);
+    }
+
+    @PostMapping("/check_user")
+    Map<String, Object> checkUser(@RequestBody ApplicationUser user) {
+        return authService.chackUser(user);
     }
 
 

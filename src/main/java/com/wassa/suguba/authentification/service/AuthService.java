@@ -31,10 +31,12 @@ import static com.wassa.suguba.authentification.constants.SecurityConstants.KEY;
 public class AuthService {
     private final ApplicationUserRepository applicationUserRepository;
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
     }
 
 
@@ -53,9 +55,7 @@ public class AuthService {
                 Claims claims = Jwts.claims().setSubject(((User) authentication.getPrincipal()).getUsername());
                 String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, key).setExpiration(exp).compact();
                 userConnected.setToken(token);
-                userConnected.setUsername(applicationUser.getUsername());
                 userConnected.setApplicationUser(user);
-                System.out.println("user connected " + userConnected.getUsername());
                 System.out.println("user type " + user.getType());
 
                 return new ResponseEntity<>(Response.success(userConnected, "Authentification réussie"), HttpStatus.OK);
@@ -90,9 +90,7 @@ public class AuthService {
             Claims claims = Jwts.claims().setSubject(((User) authentication.getPrincipal()).getUsername());
             String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, key).setExpiration(exp).compact();
             userConnected.setToken(token);
-            userConnected.setUsername(applicationUserSaved.getUsername());
             userConnected.setApplicationUser(applicationUserSaved);
-
             return new ResponseEntity<>(Response.success(userConnected, "Authentification réussie"), HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("auth error: " + e);
@@ -122,6 +120,53 @@ public class AuthService {
             result += passArray.charAt((int) Math.floor(Math.random() * charactersLength));
         }
         return result;
+    }
+
+    public String getToken(ApplicationUser applicationUser) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(applicationUser.getUsername(), applicationUser.getPassword()));
+        Date exp = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+        Key key = Keys.hmacShaKeyFor(KEY.getBytes());
+        Claims claims = Jwts.claims().setSubject(((User) authentication.getPrincipal()).getUsername());
+        String token = Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, key).setExpiration(exp).compact();
+        return token;
+    }
+
+  public Map<String, Object> chackUser(ApplicationUser user) {
+        try {
+            UserConnected userConnected = new UserConnected();
+            Optional<ApplicationUser> userOptional = applicationUserRepository.findByUsername(user.getUsername());
+            if (userOptional.isPresent()) {
+                user.setPassword(user.getUsername());
+                userConnected.setApplicationUser(userOptional.get());
+                userConnected.setToken(getToken(user));
+                userConnected.setId(1L);
+                return Response.success(userConnected, "Connexion réussie");
+            } else {
+                userConnected.setId(-1L);
+                return Response.success(userConnected, "Nouvel utilisateur");
+            }
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de vérification");
+        }
+  }
+
+    public Map<String, Object> createUser(ApplicationUser user) {
+        try {
+            ApplicationUser lastUser = new ApplicationUser();
+            user.setPassword(user.getUsername());
+            lastUser.setEntreprise(user.getEntreprise());
+            lastUser.setUsername(user.getUsername());
+            lastUser.setPassword(user.getUsername());
+            lastUser.setPassword(bCryptPasswordEncoder.encode(lastUser.getPassword()));
+            ApplicationUser userSaved = applicationUserRepository.save(lastUser);
+
+            UserConnected userConnected = new UserConnected();
+            userConnected.setApplicationUser(userSaved);
+            userConnected.setToken(getToken(user));
+            return Response.success(userConnected, "Utilisateur inscrit");
+        } catch (Exception e) {
+            return Response.error(e, "erreur d'inscription");
+        }
     }
 
 

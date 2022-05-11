@@ -51,6 +51,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         DOWNLOAD_PAIEMENTFACTURE,
                         DOWNLOAD_IMMOBILIER,
                         BANQUE_IMMOBILIER,
+                        CHECK_UP_URL,
+                        LISTE_ENTREPRISE_UP_URL,
+                        CREATE_USERU_URL,
                         AEROPORT).permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -61,9 +64,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-
-
-
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
