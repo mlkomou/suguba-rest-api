@@ -2,10 +2,12 @@ package com.wassa.suguba.authentification.constants;
 
 public class SecurityConstants {
     public static final String SIGN_UP_URL = "/users/record";
+    public static final String SIGN_UP_SOUSCRIPTION_URL = "/users/signupSouscription";
     public static final String CHECK_UP_URL = "/users/check_user";
     public static final String LISTE_ENTREPRISE_UP_URL = "/entreprises/page";
     public static final String LOGIN_UP_URL = "/users/login";
     public static final String CREATE_USERU_URL = "/users/create";
+    public static final String SEND_SMS_URL = "/users/verifify_phone/**";
     public static final String DOWNLOAD_CATEGORIE_URL = "/categories/download/*";
     public static final String DOWNLOAD_PRODUIT_URL = "/produits/download/*";
     public static final String DOWNLOAD_PRODUIT = "/produits/**";

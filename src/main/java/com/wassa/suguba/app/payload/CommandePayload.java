@@ -12,6 +12,16 @@ public class CommandePayload {
    public String statut;
    public String oneSignalNotificationId;
     public String email;
+    public String typePaiement;
+
+
+    public String getTypePaiement() {
+        return typePaiement;
+    }
+
+    public void setTypePaiement(String typePaiement) {
+        this.typePaiement = typePaiement;
+    }
 
     public String getEmail() {
         return email;

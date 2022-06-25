@@ -17,10 +17,20 @@ public class Commande extends Generality{
     String email;
     @ManyToOne
     Client client;
+    @OneToOne
+    Paiement paiement;
 
     @OneToMany(mappedBy = "commande")
     @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
     private List<LigneCommande> ligneCommandes;
+
+    public Paiement getPaiement() {
+        return paiement;
+    }
+
+    public void setPaiement(Paiement paiement) {
+        this.paiement = paiement;
+    }
 
     public String getOneSignalNotificationId() {
         return oneSignalNotificationId;

@@ -1,9 +1,6 @@
 package com.wassa.suguba.app.entity;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "client")
@@ -14,6 +11,15 @@ public class Client extends Generality{
     String email;
     String namePath;
     String phonePath;
+    private String entreprise;
+
+    public String getEntreprise() {
+        return entreprise;
+    }
+
+    public void setEntreprise(String entreprise) {
+        this.entreprise = entreprise;
+    }
 
     public String getEmail() {
         return email;

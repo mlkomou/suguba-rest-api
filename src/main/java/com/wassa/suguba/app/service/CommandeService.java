@@ -1,28 +1,22 @@
 package com.wassa.suguba.app.service;
 
-import com.wassa.suguba.app.entity.Client;
-import com.wassa.suguba.app.entity.Commande;
-import com.wassa.suguba.app.entity.LigneCommande;
-import com.wassa.suguba.app.entity.Produit;
+import com.wassa.suguba.app.entity.*;
 import com.wassa.suguba.app.payload.CommandePayload;
 import com.wassa.suguba.app.payload.NotificationPayload;
 import com.wassa.suguba.app.payload.UpdateStatut;
-import com.wassa.suguba.app.repository.ClientRepository;
-import com.wassa.suguba.app.repository.CommandeRepository;
-import com.wassa.suguba.app.repository.LigneCommendeRepository;
-import com.wassa.suguba.app.repository.ProduitRepository;
+import com.wassa.suguba.app.repository.*;
 import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 public class CommandeService {
@@ -32,16 +26,28 @@ public class CommandeService {
     private final ProduitRepository produitRepository;
     private final NotificationService notificationService;
     private final SendEmailService sendEmailService;
+    private final PaiementRepository paiementRepository;
 
-    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService) {
+    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService, PaiementRepository paiementRepository) {
         this.commandeRepository = commandeRepository;
         this.clientRepository = clientRepository;
         this.ligneCommendeRepository = ligneCommendeRepository;
         this.produitRepository = produitRepository;
         this.notificationService = notificationService;
         this.sendEmailService = sendEmailService;
+        this.paiementRepository = paiementRepository;
     }
 
+
+   double calculSum(ArrayList<Double> montantArr) {
+       double sum = 0;
+       for(int i = 0; i < montantArr.size(); i++)
+       {
+           sum = sum + montantArr.get(i);
+       }
+       return sum;
+
+   }
 
     public Map<String, Object> saveCommande(CommandePayload commandePayload) {
       try {
@@ -62,6 +68,22 @@ public class CommandeService {
             commande.setAdressePath(commandePayload.getAdressePath());
             commande.setNumero(commandePayload.getNumero());
             commande.setStatut(commandePayload.getStatut());
+
+            if (commandePayload.getTypePaiement() != null) {
+                Paiement paiement = new Paiement();
+                ArrayList<Double> montantArr = new ArrayList();
+                commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
+                    Produit produit = produitRepository.getById(ligneQuantite.getIdProduit());
+                    Double prixProd = produit.getPrix();
+                    Double prodMontant = ligneQuantite.getQuantite() * prixProd;
+                    montantArr.add(prodMontant);
+                });
+
+                paiement.setTypePaiement(commandePayload.getTypePaiement());
+                paiement.setMontant(calculSum(montantArr));
+                Paiement paiementSaved = paiementRepository.save(paiement);
+                commande.setPaiement(paiementSaved);
+            }
             Commande commandeSaved = commandeRepository.save(commande);
 
             notificationPayload.setCommandeId(commandeSaved.getId());

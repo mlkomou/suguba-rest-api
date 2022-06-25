@@ -1,7 +1,9 @@
 package com.wassa.suguba.authentification.entity;
 
 
+import com.wassa.suguba.app.entity.Client;
 import com.wassa.suguba.app.entity.Entreprise;
+import com.wassa.suguba.app.entity.Partenaire;
 
 import javax.persistence.*;
 
@@ -16,6 +18,26 @@ public class ApplicationUser {
     private String oneSignalUserId;
     @ManyToOne
     private Entreprise entreprise;
+    @ManyToOne
+    private Partenaire partenaire;
+    @ManyToOne
+    Client client;
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Partenaire getPartenaire() {
+        return partenaire;
+    }
+
+    public void setPartenaire(Partenaire partenaire) {
+        this.partenaire = partenaire;
+    }
 
     public Entreprise getEntreprise() {
         return entreprise;

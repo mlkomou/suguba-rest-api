@@ -54,6 +54,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         CHECK_UP_URL,
                         LISTE_ENTREPRISE_UP_URL,
                         CREATE_USERU_URL,
+                        SEND_SMS_URL,
+                        SIGN_UP_SOUSCRIPTION_URL,
                         AEROPORT).permitAll()
                 .anyRequest().authenticated()
                 .and()

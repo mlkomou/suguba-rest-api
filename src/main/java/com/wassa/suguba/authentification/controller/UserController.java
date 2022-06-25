@@ -1,5 +1,7 @@
 package com.wassa.suguba.authentification.controller;
 
+import com.wassa.suguba.app.entity.PhoneVerification;
+import com.wassa.suguba.app.payload.SouscriptionPayload;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
 import com.wassa.suguba.authentification.service.AuthService;
@@ -40,6 +42,11 @@ public class UserController {
         return authService.createUser(user);
     }
 
+    @PostMapping("/signupSouscription")
+    Map<String, Object> signupSouscription(@RequestBody SouscriptionPayload souscriptionPayload) {
+        return authService.signupSouscription(souscriptionPayload);
+    }
+
     @PostMapping("/user-phone")
     public ResponseEntity<Map<String, Object>> signupMobile(@RequestParam("oneSignalUserId") String oneSignalUserId) {
         return authService.signupMobileUser(oneSignalUserId);
@@ -49,6 +56,11 @@ public class UserController {
     Map<String, Object> checkUser(@RequestBody ApplicationUser user) {
         return authService.chackUser(user);
     }
+
+//    @GetMapping("/verifify_phone/{phone}")
+//    Map<String, Object> verifyPhone(@PathVariable String phone) {
+//        return authService.verifyPhone(phone);
+//    }
 
 
 }
