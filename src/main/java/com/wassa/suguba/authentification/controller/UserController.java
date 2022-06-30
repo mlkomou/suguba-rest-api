@@ -47,6 +47,11 @@ public class UserController {
         return authService.signupSouscription(souscriptionPayload);
     }
 
+    @PostMapping("/souscriptionInApp")
+    ResponseEntity<Map<String, Object>> souscriptionInApp(@RequestBody SouscriptionPayload souscriptionPayload) {
+        return authService.souscriptionInApp(souscriptionPayload);
+    }
+
     @PostMapping("/user-phone")
     public ResponseEntity<Map<String, Object>> signupMobile(@RequestParam("oneSignalUserId") String oneSignalUserId) {
         return authService.signupMobileUser(oneSignalUserId);

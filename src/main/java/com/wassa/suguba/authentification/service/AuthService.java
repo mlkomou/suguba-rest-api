@@ -237,7 +237,7 @@ public class AuthService {
             user.setClient(clientSaved);
 
             ApplicationUser userSaved = applicationUserRepository.save(user);
-            userConnected.setApplicationUser(user);
+            userConnected.setApplicationUser(userSaved);
             userConnected.setToken(getToken(userToAuth));
 
             if (Objects.equals(souscriptionPayload.getStatut(), "Oui")) {
@@ -254,6 +254,25 @@ public class AuthService {
 
         } catch (Exception e) {
             return Response.error(e, "Erreur dinscription, Veuillez réessayer plus tard.");
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload) {
+        try {
+            Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
+            if (user.isPresent()) {
+                Souscrition souscrition = new Souscrition();
+                souscrition.setNomService(souscriptionPayload.getNomService());
+                souscrition.setMontant(souscriptionPayload.getMontant());
+                souscrition.setUser(user.get());
+                Souscrition souscritionSaved = souscritionRepository.save(souscrition);
+                return new ResponseEntity<>(Response.success(souscritionSaved, "Souscrition enregistrée"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(Response.error(null, "Cet utilisateur n'existe pas."), HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(Response.error(e, "Erreur d'enregistrement de la souscrition."), HttpStatus.OK);
         }
     }
 

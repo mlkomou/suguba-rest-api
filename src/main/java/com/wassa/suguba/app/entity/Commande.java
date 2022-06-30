@@ -28,6 +28,16 @@ public class Commande extends Generality{
     @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
     private List<LigneCommande> ligneCommandes;
 
+    Boolean receptionMe;
+
+    public Boolean getReceptionMe() {
+        return receptionMe;
+    }
+
+    public void setReceptionMe(Boolean receptionMe) {
+        this.receptionMe = receptionMe;
+    }
+
     public ApplicationUser getUser() {
         return user;
     }

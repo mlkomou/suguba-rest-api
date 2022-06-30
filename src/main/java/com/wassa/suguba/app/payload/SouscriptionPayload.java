@@ -5,6 +5,15 @@ public class SouscriptionPayload {
     String statut;
     String phone;
     String nomService;
+    public Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public Double getMontant() {
         return montant;

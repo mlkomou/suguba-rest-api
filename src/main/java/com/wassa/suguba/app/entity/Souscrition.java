@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Table(name = "souscrition")
 @Access(AccessType.FIELD)
 public class Souscrition extends Generality {
-    @ManyToOne
+    @OneToOne
     private ApplicationUser user;
     @ManyToOne
     private Partenaire partenaire;
