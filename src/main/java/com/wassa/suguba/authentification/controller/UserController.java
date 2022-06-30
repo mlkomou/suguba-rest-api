@@ -53,14 +53,14 @@ public class UserController {
     }
 
     @PostMapping("/check_user")
-    Map<String, Object> checkUser(@RequestBody ApplicationUser user) {
-        return authService.chackUser(user);
+    ResponseEntity<Map<String, Object>> checkUser(@RequestBody PhoneVerification user) {
+        return authService.verifyCode(user);
     }
 
-//    @GetMapping("/verifify_phone/{phone}")
-//    Map<String, Object> verifyPhone(@PathVariable String phone) {
-//        return authService.verifyPhone(phone);
-//    }
+    @GetMapping("/verifify_phone/{phone}")
+    Map<String, Object> verifyPhone(@PathVariable String phone) {
+        return authService.sendconfirmationCode(phone);
+    }
 
 
 }

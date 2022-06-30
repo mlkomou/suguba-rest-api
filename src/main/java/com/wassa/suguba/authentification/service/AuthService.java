@@ -1,7 +1,11 @@
 package com.wassa.suguba.authentification.service;
 
 import com.wassa.suguba.app.entity.Client;
+import com.wassa.suguba.app.entity.PhoneVerification;
 import com.wassa.suguba.app.entity.Souscrition;
+import com.wassa.suguba.app.payload.SmsMessageResponse;
+import com.wassa.suguba.app.payload.SmsObject;
+import com.wassa.suguba.app.payload.Smses;
 import com.wassa.suguba.app.payload.SouscriptionPayload;
 import com.wassa.suguba.app.repository.ClientRepository;
 import com.wassa.suguba.app.repository.PhoneVerificationRepository;
@@ -146,7 +150,9 @@ public class AuthService {
         return token;
     }
 
-  public Map<String, Object> chackUser(ApplicationUser user) {
+
+
+  public UserConnected checkUser(ApplicationUser user) {
         try {
             UserConnected userConnected = new UserConnected();
             Optional<ApplicationUser> userOptional = applicationUserRepository.findByUsername(user.getUsername());
@@ -155,13 +161,13 @@ public class AuthService {
                 userConnected.setApplicationUser(userOptional.get());
                 userConnected.setToken(getToken(user));
                 userConnected.setId(1L);
-                return Response.success(userConnected, "Connexion réussie");
+                return userConnected;
             } else {
                 userConnected.setId(-1L);
-                return Response.success(userConnected, "Nouvel utilisateur");
+                return userConnected;
             }
         } catch (Exception e) {
-            return Response.error(e, "Erreur de vérification");
+            return new UserConnected();
         }
   }
 
@@ -270,5 +276,77 @@ public class AuthService {
         }
     }
 
+    public Map<String, Object> sendconfirmationCode(String phone) {
+        try {
+            Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
+            if (phoneVerificationOptional.isPresent()) {
+                String codeConf = makePassword(4);
+                SmsObject smsObject = new SmsObject();
+                List<Smses> smses = new ArrayList<>();
+                Smses smses1 = new Smses();
+                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
+                smses1.setPhoneNumber("+223" + phone);
+                smses.add(smses1);
+
+                smsObject.setLogin("kamara");
+                smsObject.setPassword("Bengaly2021!");
+                smsObject.setSenderId("WASSA PAY");
+                smsObject.setSmses(smses);
+
+                PhoneVerification phoneVerification = phoneVerificationOptional.get();
+                phoneVerification.setVerificationCode(codeConf);
+                phoneVerificationRepository.save(phoneVerification);
+                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
+                if (Objects.equals(smsMessageResponse.getData().get(0).getStatus(), "OK")) {
+                    return Response.success(smsMessageResponse, "Code envoyé");
+                } else {
+                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
+                }
+            } else {
+                String codeConf = makePassword(4);
+                SmsObject smsObject = new SmsObject();
+                List<Smses> smses = new ArrayList<>();
+                Smses smses1 = new Smses();
+                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
+                smses1.setPhoneNumber("+223" + phone);
+                smses.add(smses1);
+
+                smsObject.setLogin("kamara");
+                smsObject.setPassword("Bengaly2021!");
+                smsObject.setSenderId("WASSA PAY");
+                smsObject.setSmses(smses);
+
+                PhoneVerification phoneVerification = new PhoneVerification();
+                phoneVerification.setVerificationCode(codeConf);
+                phoneVerification.setPhone(phone);
+                phoneVerificationRepository.save(phoneVerification);
+                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
+                if (Objects.equals(smsMessageResponse.getData().get(0).getStatus(), "OK")) {
+                    return Response.success(smsMessageResponse, "Code envoyé");
+                } else {
+                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
+                }
+            }
+        } catch (Exception e) {
+            return Response.error(e, "Erreur d'envoie du code");
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> verifyCode(PhoneVerification phoneVerification) {
+        try {
+            Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhoneAndVerificationCode(phoneVerification.getPhone(), phoneVerification.getVerificationCode());
+            if (phoneVerificationOptional.isPresent()) {
+                ApplicationUser user = new ApplicationUser();
+                user.setUsername(phoneVerification.getPhone());
+                user.setPassword(phoneVerification.getPhone());
+                UserConnected userConnected = checkUser(user);
+                return new ResponseEntity<>(Response.success(userConnected, "Vérification réussie"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(Response.success(phoneVerification, "Vérification échouée."), HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(Response.error(e, "Erreur de vérification."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

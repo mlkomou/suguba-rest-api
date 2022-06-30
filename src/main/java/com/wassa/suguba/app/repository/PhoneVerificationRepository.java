@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PhoneVerificationRepository extends JpaRepository<PhoneVerification, Long> {
     Optional<PhoneVerification> findByPhone(String phone);
+    Optional<PhoneVerification> findByPhoneAndVerificationCode(String phone, String verificationCode);
 }

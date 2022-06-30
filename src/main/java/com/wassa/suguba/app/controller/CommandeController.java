@@ -26,7 +26,7 @@ public class CommandeController {
     }
 
     @PostMapping()
-    public Map<String, Object> saveCommande(@RequestBody CommandePayload commande) {
+    public ResponseEntity<Map<String, Object>> saveCommande(@RequestBody CommandePayload commande) {
         return commandeService.saveCommande(commande);
     }
 

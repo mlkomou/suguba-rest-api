@@ -1,20 +1,19 @@
 package com.wassa.suguba.app.payload;
 
-public class SmsObject {
-    public String accountid;
-    public String password;
-    public String ret_id;
-    public String ret_url;
-    public String sender;
-    public String text;
-    public String to;
+import java.util.List;
 
-    public String getAccountid() {
-        return accountid;
+public class SmsObject {
+    public String login;
+    public String password;
+    public String senderId;
+    public List<Smses> smses;
+
+    public String getLogin() {
+        return login;
     }
 
-    public void setAccountid(String accountid) {
-        this.accountid = accountid;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {
@@ -25,43 +24,19 @@ public class SmsObject {
         this.password = password;
     }
 
-    public String getRet_id() {
-        return ret_id;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setRet_id(String ret_id) {
-        this.ret_id = ret_id;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
-    public String getRet_url() {
-        return ret_url;
+    public List<Smses> getSmses() {
+        return smses;
     }
 
-    public void setRet_url(String ret_url) {
-        this.ret_url = ret_url;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
+    public void setSmses(List<Smses> smses) {
+        this.smses = smses;
     }
 }

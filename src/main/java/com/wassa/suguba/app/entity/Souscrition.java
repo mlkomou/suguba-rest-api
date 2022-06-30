@@ -14,6 +14,15 @@ public class Souscrition extends Generality {
     private Partenaire partenaire;
     Double montant;
     private String nomService;
+    private String signaturePath;
+
+    public String getSignaturePath() {
+        return signaturePath;
+    }
+
+    public void setSignaturePath(String signaturePath) {
+        this.signaturePath = signaturePath;
+    }
 
     public String getNomService() {
         return nomService;
@@ -45,5 +54,16 @@ public class Souscrition extends Generality {
 
     public void setMontant(Double montant) {
         this.montant = montant;
+    }
+
+    @Override
+    public String toString() {
+        return "Souscrition{" +
+                "user=" + user +
+                ", partenaire=" + partenaire +
+                ", montant=" + montant +
+                ", nomService='" + nomService + '\'' +
+                ", signaturePath='" + signaturePath + '\'' +
+                '}';
     }
 }

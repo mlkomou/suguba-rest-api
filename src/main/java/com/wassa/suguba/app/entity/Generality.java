@@ -38,7 +38,7 @@ public class Generality implements Serializable {
     @Column(name = "last_modified_at", columnDefinition = "DATETIME")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
     protected LocalDateTime lastModifiedAt = LocalDateTime.now() ;
-    private Boolean active = true;
+    private Boolean active = false;
 
     public Boolean getActive() {
         return active;

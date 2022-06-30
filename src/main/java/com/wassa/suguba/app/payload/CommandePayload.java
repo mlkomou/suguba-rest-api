@@ -3,6 +3,7 @@ package com.wassa.suguba.app.payload;
 import java.util.List;
 
 public class CommandePayload {
+   public Long userId;
    public List<LigneQuantite> ligneQuantites;
    public String phnoneClient;
    public String nomClient;
@@ -14,6 +15,13 @@ public class CommandePayload {
     public String email;
     public String typePaiement;
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getTypePaiement() {
         return typePaiement;

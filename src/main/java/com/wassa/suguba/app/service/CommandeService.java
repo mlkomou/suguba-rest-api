@@ -5,18 +5,19 @@ import com.wassa.suguba.app.payload.CommandePayload;
 import com.wassa.suguba.app.payload.NotificationPayload;
 import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.repository.*;
+import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
+import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 public class CommandeService {
@@ -27,8 +28,10 @@ public class CommandeService {
     private final NotificationService notificationService;
     private final SendEmailService sendEmailService;
     private final PaiementRepository paiementRepository;
+    private final ApplicationUserRepository applicationUserRepository;
+    private final SouscritionRepository souscritionRepository;
 
-    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService, PaiementRepository paiementRepository) {
+    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService, PaiementRepository paiementRepository, ApplicationUserRepository applicationUserRepository, SouscritionRepository souscritionRepository) {
         this.commandeRepository = commandeRepository;
         this.clientRepository = clientRepository;
         this.ligneCommendeRepository = ligneCommendeRepository;
@@ -36,6 +39,8 @@ public class CommandeService {
         this.notificationService = notificationService;
         this.sendEmailService = sendEmailService;
         this.paiementRepository = paiementRepository;
+        this.applicationUserRepository = applicationUserRepository;
+        this.souscritionRepository = souscritionRepository;
     }
 
 
@@ -49,8 +54,10 @@ public class CommandeService {
 
    }
 
-    public Map<String, Object> saveCommande(CommandePayload commandePayload) {
+    public ResponseEntity<Map<String, Object>> saveCommande(CommandePayload commandePayload) {
       try {
+          Optional<ApplicationUser> user = applicationUserRepository.findById(commandePayload.getUserId());
+
           NotificationPayload notificationPayload = new NotificationPayload();
             List<LigneCommande> ligneArray = new ArrayList();
             List<String> included_segments = new ArrayList<>();
@@ -62,6 +69,7 @@ public class CommandeService {
             client.setNom(commandePayload.getNomClient());
             Client clientSaved = clientRepository.save(client);
 
+            commande.setUser(user.get());
             commande.setClient(clientSaved);
             commande.setOneSignalNotificationId(commandePayload.getOneSignalNotificationId());
             commande.setAdresse(commandePayload.getAdresse());
@@ -83,35 +91,49 @@ public class CommandeService {
                 paiement.setMontant(calculSum(montantArr));
                 Paiement paiementSaved = paiementRepository.save(paiement);
                 commande.setPaiement(paiementSaved);
+            } else {
+                Souscrition souscrition = souscritionRepository.findByUserIdAndActive(commandePayload.getUserId(), true);
+                if (souscrition != null) {
+                    ArrayList<Double> montantArr = new ArrayList();
+                    commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
+                        Produit produit = produitRepository.getById(ligneQuantite.getIdProduit());
+                        Double prixProd = produit.getPrix();
+                        Double prodMontant = ligneQuantite.getQuantite() * prixProd;
+                        montantArr.add(prodMontant);
+                    });
+
+                    if (souscrition.getMontant() >= calculSum(montantArr)) {
+                        souscrition.setMontant(souscrition.getMontant() - calculSum(montantArr));
+                        souscritionRepository.save(souscrition);
+
+                        Commande commandeSaved = commandeRepository.save(commande);
+
+                        notificationPayload.setCommandeId(commandeSaved.getId());
+                        notificationPayload.setType("COMMANDE");
+                        notificationPayload.setTitre("COMMANDE");
+                        notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
+
+                        commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
+                            Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
+                            LigneCommande ligneCommande = new LigneCommande();
+                            ligneCommande.setCommande(commandeSaved);
+                            ligneCommande.setProduit(produit.get());
+                            ligneCommande.setQuantite(ligneQuantite.getQuantite());
+                            ligneArray.add(ligneCommande);
+                        });
+                        ligneCommendeRepository.saveAll(ligneArray);
+                        notificationService.saveNotification(notificationPayload, included_segments);
+                        return new ResponseEntity<>(Response.success(commandeSaved, "Commande enregistrée."), HttpStatus.OK);
+                    } else {
+                        System.err.println("MontantTotal: " + calculSum(montantArr));
+                        System.err.println("MontantSouscription: " + souscrition.getMontant());
+                        return new ResponseEntity<>(Response.error(souscrition, "Le solde de votre souscription est insuffisant pour cette commande"), HttpStatus.OK);
+                    }
+                }
             }
-            Commande commandeSaved = commandeRepository.save(commande);
-
-            notificationPayload.setCommandeId(commandeSaved.getId());
-            notificationPayload.setType("COMMANDE");
-            notificationPayload.setTitre("COMMANDE");
-            notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
-
-            commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
-                Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
-                LigneCommande ligneCommande = new LigneCommande();
-                ligneCommande.setCommande(commandeSaved);
-                ligneCommande.setProduit(produit.get());
-                ligneCommande.setQuantite(ligneQuantite.getQuantite());
-                ligneArray.add(ligneCommande);
-            });
-            ligneCommendeRepository.saveAll(ligneArray);
-            notificationService.saveNotification(notificationPayload, included_segments);
-
-            if (client.getEmail() != null) {
-                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, yyyy", Locale.FRENCH);
-                final String today = LocalDate.now().format(formatter);
-                String message = "Cher(e) " + commandeSaved.getClient().getNom() + ".\n" + "Merci de faire vos achats sur SUGUBA.\n" + "Votre commande du " + today + ", référence " + commandeSaved.getId() + "a été reçu";
-                sendEmailService.sendEmailWithAttachment(client.getEmail(), "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId(), commandeSaved.getClient().getPhone(), message);
-                return Response.success(commandeSaved, "Commande enregistrée.");
-            }
-          return Response.success(commandeSaved, "Commande enregistrée.");
+          return new ResponseEntity<>(Response.success(commande, "Commande enregistrée"), HttpStatus.OK);
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la commande.");
+            return new ResponseEntity<>(Response.error(e, "Erreur d'enregistrement de la commande."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -178,3 +200,14 @@ public class CommandeService {
         }
     }
 }
+
+
+
+
+//            if (client.getEmail() != null) {
+//                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, yyyy", Locale.FRENCH);
+//                final String today = LocalDate.now().format(formatter);
+//                String message = "Cher(e) " + commandeSaved.getClient().getNom() + ".\n" + "Merci de faire vos achats sur SUGUBA.\n" + "Votre commande du " + today + ", référence " + commandeSaved.getId() + "a été reçu";
+//                sendEmailService.sendEmailWithAttachment(client.getEmail(), "SUGUBA RECEPTION DE COMMANDE", commandeSaved.getId(), commandeSaved.getClient().getPhone(), message);
+//                return Response.success(commandeSaved, "Commande enregistrée.");
+//            }

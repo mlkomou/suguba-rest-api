@@ -1,6 +1,7 @@
 package com.wassa.suguba.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.wassa.suguba.authentification.entity.ApplicationUser;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,9 +21,20 @@ public class Commande extends Generality{
     @OneToOne
     Paiement paiement;
 
+    @ManyToOne
+    private ApplicationUser user;
+
     @OneToMany(mappedBy = "commande")
     @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
     private List<LigneCommande> ligneCommandes;
+
+    public ApplicationUser getUser() {
+        return user;
+    }
+
+    public void setUser(ApplicationUser user) {
+        this.user = user;
+    }
 
     public Paiement getPaiement() {
         return paiement;
