@@ -42,21 +42,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         LOGIN_UP_URL,
                         DOWNLOAD_CATEGORIE_URL,
                         DOWNLOAD_PRODUIT_URL,
-                        DOWNLOAD_PRODUIT,
+//                        DOWNLOAD_PRODUIT,
                         DOWNLOAD_CATEGORIE_URL,
-                        DOWNLOAD_CATEGORIE,
-                        DOWNLOAD_COMMANDE,
-                        DOWNLOAD_PHARMACIE,
-                        DOWNLOAD_VOYAGE,
-                        DOWNLOAD_PAIEMENTFACTURE,
-                        DOWNLOAD_IMMOBILIER,
-                        BANQUE_IMMOBILIER,
+//                        DOWNLOAD_CATEGORIE,
+//                        DOWNLOAD_COMMANDE,
+//                        DOWNLOAD_PHARMACIE,
+//                        DOWNLOAD_VOYAGE,
+//                        DOWNLOAD_PAIEMENTFACTURE,
+//                        DOWNLOAD_IMMOBILIER,
+//                        BANQUE_IMMOBILIER,
                         CHECK_UP_URL,
-                        LISTE_ENTREPRISE_UP_URL,
+//                        LISTE_ENTREPRISE_UP_URL,
                         CREATE_USERU_URL,
                         SEND_SMS_URL,
-                        SIGN_UP_SOUSCRIPTION_URL,
-                        AEROPORT).permitAll()
+                        SIGN_UP_SOUSCRIPTION_URL
+//                        AEROPORT
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager()))

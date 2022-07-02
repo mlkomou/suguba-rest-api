@@ -5,7 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface SouscritionRepository extends JpaRepository<Souscrition, Long> {
     Page<Souscrition> findAllByActive(Boolean active, Pageable pageable);
     Souscrition findByUserIdAndActive(Long user_id, Boolean active);
+    Optional<Souscrition> findByUserId(Long user_id);
 }

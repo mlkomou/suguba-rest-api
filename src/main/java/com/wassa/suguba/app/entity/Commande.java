@@ -28,7 +28,7 @@ public class Commande extends Generality{
     @JsonIgnoreProperties(value = {"commande"}, allowSetters = true)
     private List<LigneCommande> ligneCommandes;
 
-    Boolean receptionMe;
+   private Boolean receptionMe;
 
     public Boolean getReceptionMe() {
         return receptionMe;
@@ -118,5 +118,22 @@ public class Commande extends Generality{
 
     public void setNumero(String numero) {
         this.numero = numero;
+    }
+
+    @Override
+    public String toString() {
+        return "Commande{" +
+                "numero='" + numero + '\'' +
+                ", adresse='" + adresse + '\'' +
+                ", adressePath='" + adressePath + '\'' +
+                ", statut='" + statut + '\'' +
+                ", oneSignalNotificationId='" + oneSignalNotificationId + '\'' +
+                ", email='" + email + '\'' +
+                ", client=" + client +
+                ", paiement=" + paiement +
+                ", user=" + user +
+                ", ligneCommandes=" + ligneCommandes +
+                ", receptionMe=" + receptionMe +
+                '}';
     }
 }

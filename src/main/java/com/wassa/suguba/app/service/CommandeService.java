@@ -76,6 +76,7 @@ public class CommandeService {
             commande.setAdressePath(commandePayload.getAdressePath());
             commande.setNumero(commandePayload.getNumero());
             commande.setStatut(commandePayload.getStatut());
+            commande.setReceptionMe(commandePayload.getReceptionMe());
 
             if (commandePayload.getTypePaiement() != null) {
                 Paiement paiement = new Paiement();
@@ -91,6 +92,26 @@ public class CommandeService {
                 paiement.setMontant(calculSum(montantArr));
                 Paiement paiementSaved = paiementRepository.save(paiement);
                 commande.setPaiement(paiementSaved);
+                Commande commandeSaved = commandeRepository.save(commande);
+
+                notificationPayload.setCommandeId(commandeSaved.getId());
+                notificationPayload.setType("COMMANDE");
+                notificationPayload.setTitre("COMMANDE");
+                notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
+
+                commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
+                    Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
+                    LigneCommande ligneCommande = new LigneCommande();
+                    ligneCommande.setCommande(commandeSaved);
+                    ligneCommande.setProduit(produit.get());
+                    ligneCommande.setQuantite(ligneQuantite.getQuantite());
+                    ligneArray.add(ligneCommande);
+                });
+                ligneCommendeRepository.saveAll(ligneArray);
+//                notificationService.saveNotification(notificationPayload, included_segments);
+                System.out.println("commandeSaved: " + commandeSaved.toString());
+                return new ResponseEntity<>(Response.success(commandeSaved, "Commande enregistrée."), HttpStatus.OK);
+
             } else {
                 Souscrition souscrition = souscritionRepository.findByUserIdAndActive(commandePayload.getUserId(), true);
                 if (souscrition != null) {
@@ -122,7 +143,7 @@ public class CommandeService {
                             ligneArray.add(ligneCommande);
                         });
                         ligneCommendeRepository.saveAll(ligneArray);
-                        notificationService.saveNotification(notificationPayload, included_segments);
+//                        notificationService.saveNotification(notificationPayload, included_segments);
                         return new ResponseEntity<>(Response.success(commandeSaved, "Commande enregistrée."), HttpStatus.OK);
                     } else {
                         System.err.println("MontantTotal: " + calculSum(montantArr));

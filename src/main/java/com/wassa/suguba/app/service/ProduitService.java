@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProduitService {
@@ -96,6 +93,37 @@ public class ProduitService {
             return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
+        }
+    }
+
+    public Map<String, Object> deepSearch(String searchTerm, int page, int size) {
+        try {
+            Pageable paging = PageRequest.of(page, size);
+            Page<Produit> produits1 = produitRepository.deepSearchDescription(searchTerm, paging);
+            Page<Produit> produits2 = produitRepository.deepSearchReference(searchTerm, paging);
+            Page<Produit> produits3 = produitRepository.deepSearchCategorieName(searchTerm, paging);
+            Page<Produit> produits4 = produitRepository.deepSearchName(searchTerm, paging);
+            Page<Produit> produits5 = produitRepository.deepSearchPrix(searchTerm, paging);
+
+
+            List<Produit> arrayList1 = produits1.getContent();
+            List<Produit> arrayList2 = produits2.getContent();
+            List<Produit> arrayList3 = produits3.getContent();
+            List<Produit> arrayList4 = produits4.getContent();
+            List<Produit> arrayList5 = produits5.getContent();
+
+            List<Produit> resultatsSearch = new ArrayList<>();
+
+            resultatsSearch.addAll(arrayList1);
+            resultatsSearch.addAll(arrayList2);
+            resultatsSearch.addAll(arrayList3);
+            resultatsSearch.addAll(arrayList4);
+            resultatsSearch.addAll(arrayList5);
+
+            return Response.success(resultatsSearch, "Résultats obtenus pour le mot: " + searchTerm);
+
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de la recherche, veuillez réessayer plus tard.");
         }
     }
 }

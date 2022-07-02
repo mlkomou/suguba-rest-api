@@ -14,6 +14,15 @@ public class CommandePayload {
    public String oneSignalNotificationId;
     public String email;
     public String typePaiement;
+    private Boolean receptionMe;
+
+    public Boolean getReceptionMe() {
+        return receptionMe;
+    }
+
+    public void setReceptionMe(Boolean receptionMe) {
+        this.receptionMe = receptionMe;
+    }
 
     public Long getUserId() {
         return userId;

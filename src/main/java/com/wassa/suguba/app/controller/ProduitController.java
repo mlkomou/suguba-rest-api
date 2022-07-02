@@ -57,6 +57,11 @@ public class ProduitController {
         return produitService.getProduitsByPage(page, size);
     }
 
+    @PostMapping("/deepSearch")
+    public Map<String, Object> deepSearch(@RequestParam("page") int page, @RequestParam("size") int size, @RequestParam("searchTerm") String searchTerm) {
+        return produitService.deepSearch(searchTerm, page, size);
+    }
+
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
