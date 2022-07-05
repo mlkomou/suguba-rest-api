@@ -22,6 +22,16 @@ public class Produit extends Generality{
     @OneToMany(mappedBy = "produit")
     @JsonIgnoreProperties(value = {"produit"}, allowSetters = true)
     private List<Files> files;
+    @ManyToOne
+    private Fournisseur fournisseur;
+
+    public Fournisseur getFournisseur() {
+        return fournisseur;
+    }
+
+    public void setFournisseur(Fournisseur fournisseur) {
+        this.fournisseur = fournisseur;
+    }
 
     public List<Files> getFiles() {
         return files;

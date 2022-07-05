@@ -3,6 +3,7 @@ package com.wassa.suguba.app.controller;
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Commande;
 import com.wassa.suguba.app.payload.CommandePayload;
+import com.wassa.suguba.app.payload.IntervalleDate;
 import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.service.CommandeService;
 import org.springframework.core.io.ByteArrayResource;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -54,6 +56,11 @@ public class CommandeController {
     @PostMapping("/page")
     public Map<String, Object> getCommandesByPage(@RequestParam("page") int page, @RequestParam("size") int size) {
         return commandeService.getCommandesByPage(page, size);
+    }
+
+    @PostMapping("/dateRange")
+    public Map<String, Object> getByIntervall(@RequestBody IntervalleDate intervalleDate) {
+        return commandeService.getByIntervalleDate(intervalleDate);
     }
 
     @ResponseBody

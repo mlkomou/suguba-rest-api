@@ -1,7 +1,12 @@
 package com.wassa.suguba.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.wassa.suguba.authentification.entity.ApplicationUser;
+
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "entreprise")
@@ -11,6 +16,18 @@ public class Entreprise extends Generality{
     private String contact;
     private String altitude;
     private String longitude;
+
+    @JsonIgnoreProperties(value = {"entreprise"}, allowSetters = true)
+    @OneToMany(mappedBy = "entreprise")
+    private List<ApplicationUser> users;
+
+    public List<ApplicationUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<ApplicationUser> users) {
+        this.users = users;
+    }
 
     public String getName() {
         return name;

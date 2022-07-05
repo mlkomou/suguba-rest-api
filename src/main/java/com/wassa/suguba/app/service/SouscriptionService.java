@@ -60,7 +60,6 @@ public class SouscriptionService {
                   Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
                     souscrition.setPartenaire(partenaire.get());
                 }
-
                 Souscrition souscritionSaved = souscritionRepository.save(souscrition);
                 return Response.success(souscritionSaved, "Souscrition enregistrée.");
             } else {

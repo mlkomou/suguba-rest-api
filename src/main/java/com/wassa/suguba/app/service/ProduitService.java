@@ -2,8 +2,10 @@ package com.wassa.suguba.app.service;
 
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Files;
+import com.wassa.suguba.app.entity.Fournisseur;
 import com.wassa.suguba.app.entity.Produit;
 import com.wassa.suguba.app.repository.FilesRepository;
+import com.wassa.suguba.app.repository.FournisseurRepository;
 import com.wassa.suguba.app.repository.ProduitRepository;
 import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
@@ -21,16 +23,23 @@ public class ProduitService {
     private final ProduitRepository produitRepository;
     private final UploadFileService uploadFileService;
     private final FilesRepository filesRepository;
+    private final FournisseurRepository fournisseurRepository;
 
-    public ProduitService(ProduitRepository produitRepository, UploadFileService uploadFileService, FilesRepository filesRepository) {
+    public ProduitService(ProduitRepository produitRepository, UploadFileService uploadFileService, FilesRepository filesRepository, FournisseurRepository fournisseurRepository) {
         this.produitRepository = produitRepository;
         this.uploadFileService = uploadFileService;
         this.filesRepository = filesRepository;
+        this.fournisseurRepository = fournisseurRepository;
     }
 
 
     public Map<String, Object> saveProduit(Produit produit, List<MultipartFile> files) {
         try {
+//            Fournisseur fournisseurToSave = produit.getFournisseur();
+//            if (fournisseurToSave != null) {
+//                Optional<Fournisseur> fournisseurOptional = fournisseurRepository.findById(fournisseurToSave.getId());
+//                produit.setFournisseur(fournisseurOptional.get());
+//            }
             System.err.println("file size: " + files.size());
             Produit produitSaved = produitRepository.save(produit);
             files.forEach(multipartFile -> {
@@ -49,7 +58,7 @@ public class ProduitService {
             });
             return Response.success(produitSaved, "Produit enregistrée.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la produit.");
+            return Response.error(e, "Erreur d'enregistrement du produit.");
         }
     }
 
@@ -62,7 +71,7 @@ public class ProduitService {
             }
             return Response.error(new HashMap<>(), "Cette Produit n'existe pas.");
         } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement de la produit.");
+            return Response.error(e, "Erreur d'enregistrement du produit.");
         }
     }
 

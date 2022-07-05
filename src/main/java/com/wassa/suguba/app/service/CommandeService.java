@@ -2,6 +2,7 @@ package com.wassa.suguba.app.service;
 
 import com.wassa.suguba.app.entity.*;
 import com.wassa.suguba.app.payload.CommandePayload;
+import com.wassa.suguba.app.payload.IntervalleDate;
 import com.wassa.suguba.app.payload.NotificationPayload;
 import com.wassa.suguba.app.payload.UpdateStatut;
 import com.wassa.suguba.app.repository.*;
@@ -218,6 +219,19 @@ public class CommandeService {
             }
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de commande.");
+        }
+    }
+
+    public Map<String, Object> getByIntervalleDate(IntervalleDate intervalleDate) {
+        try {
+            System.out.println("intervalleDate: " + intervalleDate.toString());
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(intervalleDate.getPage(), intervalleDate.getSize(), defaultSort);
+            Page<Commande> commandes = commandeRepository.getByRangeDate(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), intervalleDate.getPartenaireId(), paging);
+            return Response.success(commandes, "Liste des commande");
+        } catch (Exception e) {
+            System.err.println(e);
+           return Response.error(e, "Erreur de récupération");
         }
     }
 }
