@@ -224,11 +224,59 @@ public class CommandeService {
 
     public Map<String, Object> getByIntervalleDate(IntervalleDate intervalleDate) {
         try {
-            System.out.println("intervalleDate: " + intervalleDate.toString());
+            ArrayList<Double> montantTotalArr = new ArrayList();
+            List<Commande> commandeList = commandeRepository.getByRangeDateWithoutPage(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), intervalleDate.getPartenaireId());
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
             Pageable paging = PageRequest.of(intervalleDate.getPage(), intervalleDate.getSize(), defaultSort);
             Page<Commande> commandes = commandeRepository.getByRangeDate(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), intervalleDate.getPartenaireId(), paging);
+
+            commandeList.forEach(commande -> {
+                ArrayList<Double> montantArr = new ArrayList();
+                commande.getLigneCommandes().forEach(ligneQuantite -> {
+                    Produit produit = produitRepository.getById(ligneQuantite.getProduit().getId());
+                    Double prixProd = produit.getPrix();
+                    Double prodMontant = ligneQuantite.getQuantite() * prixProd;
+                    montantArr.add(prodMontant);
+                });
+//                System.err.println("totalMonantCommandes: " + calculSum(montantArr));
+                montantTotalArr.add(calculSum(montantArr));
+            });
+//            System.err.println("somme totale des commandes: " + calculSum(montantTotalArr));
+
             return Response.success(commandes, "Liste des commande");
+        } catch (Exception e) {
+            System.err.println(e);
+           return Response.error(e, "Erreur de récupération");
+        }
+    }
+
+    public Map<String, Object> getByIntervalleDateAdmin(IntervalleDate intervalleDate) {
+        try {
+            Map<String, Object> commandeWithTotalMontant = new HashMap<>();
+            List<Commande> commandeList = commandeRepository.getByRangeDateAdminWithoutPage(intervalleDate.getDateDebut(), intervalleDate.getDateFin());
+            ArrayList<Double> montantTotalArr = new ArrayList();
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(intervalleDate.getPage(), intervalleDate.getSize(), defaultSort);
+            Page<Commande> commandes = commandeRepository.getByRangeDateAdmin(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), paging);
+
+            commandeList.forEach(commande -> {
+                ArrayList<Double> montantArr = new ArrayList();
+                commande.getLigneCommandes().forEach(ligneQuantite -> {
+                    Produit produit = produitRepository.getById(ligneQuantite.getProduit().getId());
+                    Double prixProd = produit.getPrix();
+                    Double prodMontant = ligneQuantite.getQuantite() * prixProd;
+                    montantArr.add(prodMontant);
+                });
+
+//                System.err.println("totalMonantCommandes: " + calculSum(montantArr));
+                montantTotalArr.add(calculSum(montantArr));
+            });
+
+//            System.err.println("somme totale des commandes: " + calculSum(montantTotalArr));
+            commandeWithTotalMontant.put("commandes", commandes);
+            commandeWithTotalMontant.put("montantTotal", calculSum(montantTotalArr));
+
+            return Response.success(commandeWithTotalMontant, "Liste des commande");
         } catch (Exception e) {
             System.err.println(e);
            return Response.error(e, "Erreur de récupération");

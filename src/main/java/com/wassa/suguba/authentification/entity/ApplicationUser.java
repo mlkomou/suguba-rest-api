@@ -23,6 +23,17 @@ public class ApplicationUser {
     @ManyToOne
     Client client;
 
+    @ManyToOne
+    private Partenaire servicePaiement;
+
+    public Partenaire getServicePaiement() {
+        return servicePaiement;
+    }
+
+    public void setServicePaiement(Partenaire servicePaiement) {
+        this.servicePaiement = servicePaiement;
+    }
+
     public Client getClient() {
         return client;
     }

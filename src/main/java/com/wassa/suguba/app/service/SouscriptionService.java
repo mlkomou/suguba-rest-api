@@ -50,16 +50,23 @@ public class SouscriptionService {
             if (souscritionOptional.isPresent()) {
                 Souscrition souscrition = souscritionOptional.get();
                 ApplicationUser user = souscrition.getUser();
+
+
                 Client client = user.getClient();
                 client.setPrenom(souscriptionClient.getPrenom());
                 client.setNom(souscriptionClient.getNom());
                 client.setEmail(souscriptionClient.getEmail());
-                clientRepository.save(client);
+
 
                 if (souscriptionClient.getPartenaire() != null) {
                   Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
                     souscrition.setPartenaire(partenaire.get());
+                    client.setPartenaire(partenaire.get());
+                    user.setServicePaiement(partenaire.get());
                 }
+                applicationUserRepository.save(user);
+                souscrition.setUser(user);
+                clientRepository.save(client);
                 Souscrition souscritionSaved = souscritionRepository.save(souscrition);
                 return Response.success(souscritionSaved, "Souscrition enregistrée.");
             } else {

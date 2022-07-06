@@ -63,6 +63,11 @@ public class CommandeController {
         return commandeService.getByIntervalleDate(intervalleDate);
     }
 
+    @PostMapping("/dateRangeAdmin")
+    public Map<String, Object> getByIntervallAdmin(@RequestBody IntervalleDate intervalleDate) {
+        return commandeService.getByIntervalleDateAdmin(intervalleDate);
+    }
+
     @ResponseBody
     @GetMapping("/logo/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {

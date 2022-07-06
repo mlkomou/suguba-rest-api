@@ -16,8 +16,14 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
     List<Commande> findAllById(Long id);
 
-    @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate AND c.user.partenaire.id = :partenaireId")
-//    @Query("select c from Commande c where c.createdAt >= ?1 and c.createdAt <= ?2 and c.user.partenaire.id = ?3")
-    Page<Commande> getByRangeDate(@Param("startDate") LocalDateTime startDate,
-                                   @Param("endDate") LocalDateTime endDate, @Param("partenaireId") Long partenaireId, Pageable pageable);
+    @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate AND c.user.servicePaiement.id = :partenaireId")
+    Page<Commande> getByRangeDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("partenaireId") Long partenaireId, Pageable pageable);
+    @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate")
+    Page<Commande> getByRangeDateAdmin(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+
+    //all liste with paging
+    @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate AND c.user.servicePaiement.id = :partenaireId")
+    List<Commande> getByRangeDateWithoutPage(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("partenaireId") Long partenaireId);
+    @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate")
+    List<Commande> getByRangeDateAdminWithoutPage(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

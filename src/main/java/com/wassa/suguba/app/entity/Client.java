@@ -13,6 +13,16 @@ public class Client extends Generality{
     String namePath;
     String phonePath;
     private String entreprise;
+    @ManyToOne
+    private Partenaire partenaire;
+
+    public Partenaire getPartenaire() {
+        return partenaire;
+    }
+
+    public void setPartenaire(Partenaire partenaire) {
+        this.partenaire = partenaire;
+    }
 
     public String getPrenom() {
         return prenom;
