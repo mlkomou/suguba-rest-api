@@ -1,10 +1,7 @@
 package com.wassa.suguba.app.service;
 
 import com.wassa.suguba.app.entity.*;
-import com.wassa.suguba.app.payload.CommandePayload;
-import com.wassa.suguba.app.payload.IntervalleDate;
-import com.wassa.suguba.app.payload.NotificationPayload;
-import com.wassa.suguba.app.payload.UpdateStatut;
+import com.wassa.suguba.app.payload.*;
 import com.wassa.suguba.app.repository.*;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
@@ -17,6 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -52,7 +56,6 @@ public class CommandeService {
            sum = sum + montantArr.get(i);
        }
        return sum;
-
    }
 
     public ResponseEntity<Map<String, Object>> saveCommande(CommandePayload commandePayload) {
@@ -224,6 +227,7 @@ public class CommandeService {
 
     public Map<String, Object> getByIntervalleDate(IntervalleDate intervalleDate) {
         try {
+            Map<String, Object> commandeWithTotalMontant = new HashMap<>();
             ArrayList<Double> montantTotalArr = new ArrayList();
             List<Commande> commandeList = commandeRepository.getByRangeDateWithoutPage(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), intervalleDate.getPartenaireId());
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
@@ -241,9 +245,11 @@ public class CommandeService {
 //                System.err.println("totalMonantCommandes: " + calculSum(montantArr));
                 montantTotalArr.add(calculSum(montantArr));
             });
+            commandeWithTotalMontant.put("commandes", commandes);
+            commandeWithTotalMontant.put("montantTotal", calculSum(montantTotalArr));
 //            System.err.println("somme totale des commandes: " + calculSum(montantTotalArr));
 
-            return Response.success(commandes, "Liste des commande");
+            return Response.success(commandeWithTotalMontant, "Liste des commande");
         } catch (Exception e) {
             System.err.println(e);
            return Response.error(e, "Erreur de récupération");
@@ -280,6 +286,38 @@ public class CommandeService {
         } catch (Exception e) {
             System.err.println(e);
            return Response.error(e, "Erreur de récupération");
+        }
+    }
+
+    public List<Commande> getAllCommande() {
+        return commandeRepository.findAll();
+    }
+
+    public Map<String, Object> exportToPDF(IntervalleDate intervalleDate,  HttpServletResponse response) {
+//        HttpServletResponse response = new HttpServletResponse();
+        try {
+            List<Commande> commandeList;
+            if (intervalleDate.getPartenaireId() == null) {
+                 commandeList = commandeRepository.getByRangeDateAdminWithoutPage(intervalleDate.getDateDebut(), intervalleDate.getDateFin());
+
+            } else {
+                commandeList = commandeRepository.getByRangeDateWithoutPage(intervalleDate.getDateDebut(), intervalleDate.getDateFin(), intervalleDate.getPartenaireId());
+            }
+            response.setContentType("application/pdf");
+            DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+            String currentDateTime = dateFormatter.format(new Date());
+
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=commandes_" + currentDateTime + ".pdf";
+            response.setHeader(headerKey, headerValue);
+
+            CommandePDFExporter exporter = new CommandePDFExporter(commandeList);
+            exporter.export(response);
+
+            return Response.success(null, "PDF exporté avec succès.");
+        } catch (Exception e) {
+            System.err.println(e);
+            return Response.error(e, "Exportation échouée");
         }
     }
 }

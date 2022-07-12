@@ -1,8 +1,8 @@
 package com.wassa.suguba.app.controller;
 
-import com.wassa.suguba.app.entity.Partenaire;
 import com.wassa.suguba.app.payload.PartenaireUsers;
 import com.wassa.suguba.app.service.PartenaireService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,6 +19,11 @@ public class PartenaireController {
     @PostMapping()
     public Map<String, Object> savePartenaire(@RequestBody PartenaireUsers partenaire) {
         return partenaireService.savePartenaire(partenaire);
+    }
+
+    @GetMapping("/bycode/{codePartenaire}")
+    public ResponseEntity<Map<String, Object>> getPartenaireByCode(@PathVariable String codePartenaire) {
+        return partenaireService.getPartenaireByCode(codePartenaire);
     }
 
     @PostMapping("/page")

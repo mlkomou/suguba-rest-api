@@ -14,6 +14,15 @@ public class Partenaire extends Generality{
     private String contact;
     private String altitude;
     private String longitude;
+    private String codePartenaire;
+
+    public String getCodePartenaire() {
+        return codePartenaire;
+    }
+
+    public void setCodePartenaire(String codePartenaire) {
+        this.codePartenaire = codePartenaire;
+    }
 
     public String getNom() {
         return nom;

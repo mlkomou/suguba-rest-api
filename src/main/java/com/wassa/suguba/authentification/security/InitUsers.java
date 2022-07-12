@@ -16,13 +16,25 @@ public class InitUsers implements ApplicationRunner {
 
     private final ApplicationUserRepository applicationUser;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public InitUsers(ApplicationUserRepository applicationUser, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.applicationUser = applicationUser;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+
     }
 
     @Override
     public void run(ApplicationArguments args) {
+//
+//        List<Produit> produits = produitRepository.findAll();
+//        produits.forEach(produit -> {
+//            if (produit.getFournisseur() == null) {
+//                Fournisseur fournisseur = fournisseurRepository.getById(1L);
+//                produit.setFournisseur(fournisseur);
+//                produitRepository.save(produit);
+//            }
+//        });
+
         Optional<ApplicationUser> applicationUserOptional = applicationUser.findByUsername("komou35@gmail.com");
         if (applicationUserOptional.isPresent()) return;
         ApplicationUser user = new  ApplicationUser();

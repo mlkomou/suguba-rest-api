@@ -2,6 +2,7 @@ package com.wassa.suguba.app.controller;
 
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Commande;
+import com.wassa.suguba.app.payload.CommandePDFExporter;
 import com.wassa.suguba.app.payload.CommandePayload;
 import com.wassa.suguba.app.payload.IntervalleDate;
 import com.wassa.suguba.app.payload.UpdateStatut;
@@ -17,6 +18,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.lowagie.text.DocumentException;
 
 @RestController
 @RequestMapping("/commandes")
@@ -67,6 +84,26 @@ public class CommandeController {
     public Map<String, Object> getByIntervallAdmin(@RequestBody IntervalleDate intervalleDate) {
         return commandeService.getByIntervalleDateAdmin(intervalleDate);
     }
+
+    @PostMapping("/export/pdf")
+    public Map<String, Object> exportToPDF(@RequestBody IntervalleDate intervalleDate, HttpServletResponse response) {
+       return commandeService.exportToPDF(intervalleDate, response);
+    }
+//    public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
+//        response.setContentType("application/pdf");
+//        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+//        String currentDateTime = dateFormatter.format(new Date());
+//
+//        String headerKey = "Content-Disposition";
+//        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+//        response.setHeader(headerKey, headerValue);
+//
+//        List<Commande> commandeList = commandeService.getAllCommande();
+//
+//        CommandePDFExporter exporter = new CommandePDFExporter(commandeList);
+//        exporter.export(response);
+//
+//    }
 
     @ResponseBody
     @GetMapping("/logo/{photo}")
