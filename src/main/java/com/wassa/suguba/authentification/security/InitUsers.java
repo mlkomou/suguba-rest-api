@@ -34,14 +34,14 @@ public class InitUsers implements ApplicationRunner {
 //                produitRepository.save(produit);
 //            }
 //        });
-
-        Optional<ApplicationUser> applicationUserOptional = applicationUser.findByUsername("komou35@gmail.com");
+        Optional<ApplicationUser> applicationUserOptional = applicationUser.findByUsername("suguba@gmail.com");
         if (applicationUserOptional.isPresent()) return;
         ApplicationUser user = new  ApplicationUser();
 
-        user.setUsername("komou35@gmail.com");
-        user.setPassword(bCryptPasswordEncoder.encode("77114120"));
+        user.setUsername("suguba@gmail.com");
+        user.setPassword(bCryptPasswordEncoder.encode("suguba"));
         user.setType("Admin");
         applicationUser.save(user);
-    }
+
+            }
 }

@@ -1,6 +1,10 @@
 package com.wassa.suguba.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,24 +25,29 @@ public class Generality implements Serializable {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @CreatedBy
-    @Column(name = "created_by")
-    protected String createdBy;
+
 
     @CreatedBy
     @Column(name = "last_modified_by")
     protected String lastModifiedBy;
 
+    @CreatedBy
+    @Column(name = "created_by")
+    protected String createdBy;
+
     @CreatedDate
     @Column(name = "created_at", columnDefinition = "DATETIME")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
     protected LocalDateTime createdAt= LocalDateTime.now();
 
     @LastModifiedDate
     @Column(name = "last_modified_at", columnDefinition = "DATETIME")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     protected LocalDateTime lastModifiedAt = LocalDateTime.now() ;
-    private Boolean active = false;
+    private Boolean active = true;
 
     public Boolean getActive() {
         return active;

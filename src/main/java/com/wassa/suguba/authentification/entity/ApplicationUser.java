@@ -1,11 +1,16 @@
 package com.wassa.suguba.authentification.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wassa.suguba.app.entity.Client;
 import com.wassa.suguba.app.entity.Entreprise;
 import com.wassa.suguba.app.entity.Partenaire;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class ApplicationUser {
@@ -25,6 +30,68 @@ public class ApplicationUser {
 
     @ManyToOne
     private Partenaire servicePaiement;
+
+    private Boolean supprime = true;
+
+
+    @CreatedBy
+    @Column(name = "last_modified_by")
+    protected String lastModifiedBy;
+
+    @CreatedBy
+    @Column(name = "created_by")
+    protected String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_at", columnDefinition = "DATETIME")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
+    protected LocalDateTime createdAt= LocalDateTime.now();
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at", columnDefinition = "DATETIME")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
+    protected LocalDateTime lastModifiedAt = LocalDateTime.now() ;
+
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastModifiedAt() {
+        return lastModifiedAt;
+    }
+
+    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+        this.lastModifiedAt = lastModifiedAt;
+    }
+
+    public Boolean getSupprime() {
+        return supprime;
+    }
+
+    public void setSupprime(Boolean supprime) {
+        this.supprime = supprime;
+    }
 
     public Partenaire getServicePaiement() {
         return servicePaiement;

@@ -1,6 +1,7 @@
 package com.wassa.suguba.authentification.controller;
 
 import com.wassa.suguba.app.entity.PhoneVerification;
+import com.wassa.suguba.app.payload.AdminUserPayload;
 import com.wassa.suguba.app.payload.SouscriptionPayload;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.util.Map;
 
 @RestController
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    Map<String, Object> createUser(@RequestBody ApplicationUser user) {
+    Map<String, Object> createUser(@RequestBody AdminUserPayload user) {
         return authService.createUser(user);
     }
 
@@ -50,6 +52,11 @@ public class UserController {
     @PostMapping("/souscriptionInApp")
     ResponseEntity<Map<String, Object>> souscriptionInApp(@RequestBody SouscriptionPayload souscriptionPayload) {
         return authService.souscriptionInApp(souscriptionPayload);
+    }
+
+    @PostMapping("/page")
+    public Map<String, Object> getUsers(@RequestParam("page") int page, @RequestParam("size") int size) {
+        return authService.getUsers(page, size);
     }
 
     @PostMapping("/user-phone")
@@ -67,5 +74,13 @@ public class UserController {
         return authService.sendconfirmationCode(phone);
     }
 
+    @GetMapping("/delete/{userId}")
+    public Map<String, Object> deleteUser(@PathVariable Long userId) {
+        return authService.deleteUser(userId);
+    }
 
+    @GetMapping("/sendEmnail")
+    public void SendEmail() throws MessagingException {
+     authService.sendEmail();
+    }
 }

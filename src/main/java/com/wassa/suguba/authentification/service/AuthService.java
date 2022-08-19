@@ -1,12 +1,9 @@
 package com.wassa.suguba.authentification.service;
 
-import com.wassa.suguba.app.entity.Client;
-import com.wassa.suguba.app.entity.PhoneVerification;
-import com.wassa.suguba.app.entity.Souscrition;
+import com.wassa.suguba.app.entity.*;
 import com.wassa.suguba.app.payload.*;
-import com.wassa.suguba.app.repository.ClientRepository;
-import com.wassa.suguba.app.repository.PhoneVerificationRepository;
-import com.wassa.suguba.app.repository.SouscritionRepository;
+import com.wassa.suguba.app.repository.*;
+import com.wassa.suguba.app.service.SendEmailService;
 import com.wassa.suguba.app.service.SendSmsService;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
@@ -19,6 +16,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +26,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.wassa.suguba.authentification.constants.SecurityConstants.EXPIRATION_TIME;
@@ -44,8 +44,11 @@ public class AuthService {
     private final SendSmsService sendSmsService;
     private final ClientRepository clientRepository;
     private final SouscritionRepository souscritionRepository;
+    private final PartenaireRepository partenaireRepository;
+    private final DemandeSouscriptionRepository demandeSouscriptionRepository;
+    private final SendEmailService sendEmailService;
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository) {
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
@@ -53,8 +56,10 @@ public class AuthService {
         this.sendSmsService = sendSmsService;
         this.clientRepository = clientRepository;
         this.souscritionRepository = souscritionRepository;
+        this.partenaireRepository = partenaireRepository;
+        this.demandeSouscriptionRepository = demandeSouscriptionRepository;
+        this.sendEmailService = sendEmailService;
     }
-
 
     public ResponseEntity<Map<String, Object>> loginUser(ApplicationUser applicationUser) {
         try {
@@ -125,9 +130,6 @@ public class AuthService {
         }
     }
 
-
-
-
     String makePassword(int qoutas) {
         String passArray = "0123456789";
         int charactersLength = passArray.length();
@@ -147,8 +149,6 @@ public class AuthService {
         return token;
     }
 
-
-
   public UserConnected checkUser(ApplicationUser user) {
         try {
             UserConnected userConnected = new UserConnected();
@@ -167,56 +167,6 @@ public class AuthService {
             return new UserConnected();
         }
   }
-
-//    public Map<String, Object> verifyPhone(String phone) {
-//        try {
-//            String phoneCode = makePassword(4);
-////            Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
-//            PhoneVerification phoneVerification = new PhoneVerification();
-//            phoneVerification.setPhone(phone);
-//
-//            phoneVerification.setVerificationCode(phoneCode);
-////            PhoneVerification phoneVerificationSaved = phoneVerificationRepository.save(phoneVerification);
-//            //send sms
-////                SmsObject smsObject = new SmsObject();
-////                String text = phoneCode + " " + "est votre code de vérification pour SUGUBA.";
-////                smsObject.setAccountid("Jonathan");
-////                smsObject.setPassword("mdq1372dLZ");
-////                smsObject.setRet_id(makePassword(10));
-////                smsObject.setSender("SUGUBA");
-////                smsObject.setText(text);
-////                smsObject.setRet_url("https://suguba.com");
-////                smsObject.setTo("223" + phoneVerification.getPhone());
-//////                sendSmsService.sendSms(smsObject);
-//                   String responseSms = sendSmsService.sendJson(phone);
-//                    return Response.success(responseSms, "Sms envoyé.");
-//
-////            if (phoneVerificationOptional.isPresent()) {
-////
-////
-////            }
-////            else {
-////                phoneVerification.setVerificationCode(phoneCode);
-////                PhoneVerification phoneVerificationNew = phoneVerificationRepository.save(phoneVerification);
-////                SmsObject smsObject = new SmsObject();
-////                String text = phoneCode + " " + "est votre code de vérification pour SUGUBA.";
-////                smsObject.setAccountid("Jonathan");
-////                smsObject.setPassword("mdq1372dLZ");
-////                smsObject.setRet_id(makePassword(10));
-////                smsObject.setSender("SUGUBA");
-////                smsObject.setText(text);
-////                smsObject.setRet_url("https://suguba.com");
-////                smsObject.setTo("223" + phoneVerification.getPhone());
-////                sendSmsService.sendSms(smsObject);
-////                sendSmsService.sendJson();
-////                return Response.success(phoneVerificationNew, "Sms envoyé.");
-//         //   }
-//
-//        } catch (Exception e) {
-//            System.err.println(e);
-//            return Response.error(e, "Erreur de vérification");
-//        }
-//    }
 
     public Map<String, Object> signupSouscription(SouscriptionPayload souscriptionPayload) {
         try {
@@ -238,11 +188,21 @@ public class AuthService {
             userConnected.setToken(getToken(userToAuth));
 
             if (Objects.equals(souscriptionPayload.getStatut(), "Oui")) {
-                Souscrition souscrition = new Souscrition();
-                souscrition.setNomService(souscriptionPayload.getNomService());
+                Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByUserIdAndStatut(userSaved.getId(), "TRAITEMENT");
+                if (demandeSouscriptionOptional.isPresent()) {
+                    DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
+                    demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    demandeSouscriptionRepository.save(demandeSouscription);
+
+                    return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
+                }
+
+                DemandeSouscription souscrition = new DemandeSouscription();
+//                souscrition.setNomService(souscriptionPayload.getNomService());
                 souscrition.setMontant(souscriptionPayload.getMontant());
                 souscrition.setUser(userSaved);
-                souscritionRepository.save(souscrition);
+                souscrition.setStatut("TRAITEMENT");
+                demandeSouscriptionRepository.save(souscrition);
 
                 return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
             } else {
@@ -258,23 +218,39 @@ public class AuthService {
         try {
             Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
             if (user.isPresent()) {
-                Optional<Souscrition> souscritionOptional = souscritionRepository.findByUserId(souscriptionPayload.getUserId());
-                if (souscritionOptional.isPresent()) {
-                    Souscrition souscritionOld = souscritionOptional.get();
-                    if (souscritionOld.getActive()) {
-                        return new ResponseEntity<>(Response.success(souscritionOld, "Vous avez déjà une souscrition en cours."), HttpStatus.OK);
-                    }
-                    souscritionOld.setMontant(souscriptionPayload.getMontant());
-                    souscritionOld.setNomService(souscriptionPayload.getNomService());
-                    Souscrition souscritionUpdated = souscritionRepository.save(souscritionOld);
-                    return new ResponseEntity<>(Response.success(souscritionUpdated, "Vous aviez déjà une souscrition non active, elle a été modifiée."), HttpStatus.OK);
+//                Optional<Souscrition> souscritionOptional = souscritionRepository.findByUserId(souscriptionPayload.getUserId());
+                Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByUserIdAndStatut(user.get().getId(), "TRAITEMENT");
+                if (demandeSouscriptionOptional.isPresent()) {
+                    DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
+                    demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
+                    //enregistrement de la demande de souscription
+                    return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
+                } else {
+                    DemandeSouscription demandeSouscription = new DemandeSouscription();
+                    demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    demandeSouscription.setStatut("TRAITEMENT");
+                    demandeSouscription.setUser(user.get());
+                    DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
+                    return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 }
-                Souscrition souscrition = new Souscrition();
-                souscrition.setNomService(souscriptionPayload.getNomService());
-                souscrition.setMontant(souscriptionPayload.getMontant());
-                souscrition.setUser(user.get());
-                Souscrition souscritionSaved = souscritionRepository.save(souscrition);
-                return new ResponseEntity<>(Response.success(souscritionSaved, "Souscrition enregistrée"), HttpStatus.OK);
+
+//                if (souscritionOptional.isPresent()) {
+//                    Souscrition souscritionOld = souscritionOptional.get();
+//                    if (souscritionOld.getActive()) {
+//                        return new ResponseEntity<>(Response.success(souscritionOld, "Vous avez déjà une souscrition en cours."), HttpStatus.OK);
+//                    }
+//                    souscritionOld.setMontant(souscriptionPayload.getMontant());
+//                    souscritionOld.setNomService(souscriptionPayload.getNomService());
+//                    Souscrition souscritionUpdated = souscritionRepository.save(souscritionOld);
+//                    return new ResponseEntity<>(Response.success(souscritionUpdated, "Vous aviez déjà une souscrition non active, elle a été modifiée."), HttpStatus.OK);
+//                }
+//                Souscrition souscrition = new Souscrition();
+//                souscrition.setNomService(souscriptionPayload.getNomService());
+//                souscrition.setMontant(souscriptionPayload.getMontant());
+//                souscrition.setUser(user.get());
+//                Souscrition souscritionSaved = souscritionRepository.save(souscrition);
+//                return new ResponseEntity<>(Response.success(souscritionSaved, "Souscrition enregistrée"), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(Response.error(null, "Cet utilisateur n'existe pas."), HttpStatus.OK);
             }
@@ -284,21 +260,50 @@ public class AuthService {
         }
     }
 
-    public Map<String, Object> createUser(ApplicationUser user) {
+    public Map<String, Object> createUser(AdminUserPayload adminUserPayload) {
         try {
-            ApplicationUser lastUser = new ApplicationUser();
-            user.setPassword(user.getUsername());
-            lastUser.setEntreprise(user.getEntreprise());
-            lastUser.setUsername(user.getUsername());
-            lastUser.setPassword(user.getUsername());
-            lastUser.setPassword(bCryptPasswordEncoder.encode(lastUser.getPassword()));
-            ApplicationUser userSaved = applicationUserRepository.save(lastUser);
+            if (adminUserPayload.getId() != null) {
+                Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(adminUserPayload.getId());
+                if (applicationUserOptional.isPresent()) {
+                    ApplicationUser applicationUser = applicationUserOptional.get();
+                    applicationUser.setType(adminUserPayload.getTypeUser());
+                    applicationUser.setLastModifiedAt(LocalDateTime.now());
+                    ApplicationUser applicationUserSaved = applicationUserRepository.save(applicationUser);
+                    Client client = applicationUser.getClient();
+                    client.setPhone(adminUserPayload.getPhone());
+                    client.setPrenom(adminUserPayload.getPrenom());
+                    client.setNom(adminUserPayload.getNom());
+                    client.setEmail(adminUserPayload.getEmail());
+                    clientRepository.save(client);
+                    return Response.success(applicationUserSaved, "Utilisateur modifié.");
+                }
+            }
+
+            Client client = new Client();
+            client.setPhone(adminUserPayload.getPhone());
+            client.setPrenom(adminUserPayload.getPrenom());
+            client.setNom(adminUserPayload.getNom());
+            client.setEmail(adminUserPayload.getEmail());
+            Client clientSaved = clientRepository.save(client);
+
+            ApplicationUser applicationUserAuth = new ApplicationUser();
+            applicationUserAuth.setUsername(adminUserPayload.getEmail());
+            applicationUserAuth.setPassword(adminUserPayload.getPassword());
+
+            ApplicationUser newUser = new ApplicationUser();
+            newUser.setClient(clientSaved);
+            newUser.setPassword(bCryptPasswordEncoder.encode(adminUserPayload.password));
+            newUser.setUsername(adminUserPayload.getEmail());
+            newUser.setType(adminUserPayload.getTypeUser());
+
+            ApplicationUser userSaved = applicationUserRepository.save(newUser);
 
             UserConnected userConnected = new UserConnected();
             userConnected.setApplicationUser(userSaved);
-            userConnected.setToken(getToken(user));
+            userConnected.setToken(getToken(applicationUserAuth));
             return Response.success(userConnected, "Utilisateur inscrit");
         } catch (Exception e) {
+            System.err.println(e);
             return Response.error(e, "erreur d'inscription");
         }
     }
@@ -306,26 +311,46 @@ public class AuthService {
     public Map<String, Object> sendconfirmationCode(String phone) {
         try {
             Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
-            SmsContent smsContent = new SmsContent();
-            List<SmsContent> smsContentList = new ArrayList<>();
-            SendSms sms = new SendSms();
+//            SmsContent smsContent = new SmsContent();
+//            List<SmsContent> smsContentList = new ArrayList<>();
+//            SendSms sms = new SendSms();
             if (phoneVerificationOptional.isPresent()) {
                 String codeConf = makePassword(4);
-                smsContent.setTo("+223" + phone);
-                smsContent.setMessage(codeConf + " " + "est votre de vérification pour SUGUBA.");
-                smsContentList.add(smsContent);
-                sms.setMessages(smsContentList);
-                sms.setSender_id("SUGUBA");
+
+                SmsObject smsObject = new SmsObject();
+                List<Smses> smses = new ArrayList<>();
+                Smses smses1 = new Smses();
+                smses1.setText(codeConf + " " + "est votre code de vérification pour SUGUBA.");
+                smses1.setPhoneNumber("+223" + phone);
+                smses.add(smses1);
+
+                smsObject.setLogin("kamara");
+                smsObject.setPassword("Bengaly2021!");
+                smsObject.setSenderId("SUGUBA");
+                smsObject.setSmses(smses);
 
                 PhoneVerification phoneVerification = phoneVerificationOptional.get();
                 phoneVerification.setVerificationCode(codeConf);
                 phoneVerificationRepository.save(phoneVerification);
+                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
 
-                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
-                if (smsResponse.success) {
-                    return Response.success(smsResponse, "Code envoyé");
+
+
+//                smsContent.setTo("+223" + phone);
+//                smsContent.setMessage(codeConf + " " + "est votre de vérification pour SUGUBA.");
+//                smsContentList.add(smsContent);
+//                sms.setMessages(smsContentList);
+//                sms.setSender_id("SUGUBA");
+//
+//                PhoneVerification phoneVerification = phoneVerificationOptional.get();
+//                phoneVerification.setVerificationCode(codeConf);
+                phoneVerificationRepository.save(phoneVerification);
+//                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
+
+                if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
+                    return Response.success(smsMessageResponse, "Code envoyé");
                 } else {
-                    return Response.error(smsResponse, "Erreur d'envoie du code");
+                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
                 }
 //                SmsObject smsObject = new SmsObject();
 //                List<Smses> smses = new ArrayList<>();
@@ -350,33 +375,37 @@ public class AuthService {
 //                }
             } else {
                 String codeConf = makePassword(4);
-//                SmsObject smsObject = new SmsObject();
-//                List<Smses> smses = new ArrayList<>();
-//                Smses smses1 = new Smses();
-//                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
-//                smses1.setPhoneNumber("+223" + phone);
-//                smses.add(smses1);
-//
-//                smsObject.setLogin("kamara");
-//                smsObject.setPassword("Bengaly2021!");
-//                smsObject.setSenderId("WASSA PAY");
-//                smsObject.setSmses(smses);
-                smsContent.setTo("+223" + phone);
-                smsContent.setMessage(codeConf + " " + "est votre code de vérification pour SUGUBA.");
-                smsContentList.add(smsContent);
-                sms.setMessages(smsContentList);
-                sms.setSender_id("SUGUBA");
+                SmsObject smsObject = new SmsObject();
+                List<Smses> smses = new ArrayList<>();
+                Smses smses1 = new Smses();
+                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
+                smses1.setPhoneNumber("+223" + phone);
+                smses.add(smses1);
+
+                smsObject.setLogin("kamara");
+                smsObject.setPassword("Bengaly2021!");
+                smsObject.setSenderId("WASSA PAY");
+                smsObject.setSmses(smses);
+
+
+
+//                smsContent.setTo("+223" + phone);
+//                smsContent.setMessage(codeConf + " " + "est votre code de vérification pour SUGUBA.");
+//                smsContentList.add(smsContent);
+//                sms.setMessages(smsContentList);
+//                sms.setSender_id("SUGUBA");
 
                 PhoneVerification phoneVerification = new PhoneVerification();
                 phoneVerification.setVerificationCode(codeConf);
                 phoneVerification.setPhone(phone);
                 phoneVerificationRepository.save(phoneVerification);
 
-                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
-                if (smsResponse.success) {
-                    return Response.success(smsResponse, "Code envoyé");
+                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
+//                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
+                if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
+                    return Response.success(smsMessageResponse, "Code envoyé");
                 } else {
-                    return Response.error(smsResponse, "Erreur d'envoie du code");
+                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
                 }
 
 //                PhoneVerification phoneVerification = new PhoneVerification();
@@ -412,4 +441,85 @@ public class AuthService {
         }
     }
 
+    public Map<String, Object> getUsers(int page, int size) {
+        try {
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "lastModifiedAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
+            Page<ApplicationUser> users = applicationUserRepository.findAllBySupprime(true, paging);
+            return Response.success(users, "Liste des utilisateurs");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de récupération");
+        }
+    }
+
+    public Map<String, Object> deleteUser(Long userId) {
+        try {
+            Optional<ApplicationUser> user = applicationUserRepository.findById(userId);
+            if (user.isPresent()) {
+                ApplicationUser applicationUser = user.get();
+                applicationUser.setSupprime(false);
+               applicationUserRepository.save(applicationUser);
+            }
+            return Response.success(null, "Utilisateur supprimé.");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de suppression.");
+        }
+    }
+
+    public Map<String, Object> createUser(UserPayload userPayload) {
+        try {
+//            Client client = new Client();
+//            client.setEmail(userPayload.getEmail());
+//            client.set
+            if (userPayload.getId() != null) {
+                Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(userPayload.getId());
+                if (applicationUserOptional.isPresent()) {
+                    ApplicationUser oldUser = applicationUserOptional.get();
+                    Client client = oldUser.getClient();
+                    client.setNom(userPayload.getNom());
+                    client.setEmail(userPayload.getEmail());
+                    client.setPhone(userPayload.getPhone());
+                    client.setPrenom(userPayload.getPrenom());
+                    clientRepository.save(client);
+
+                    if (userPayload.getPartenaireId() != null) {
+                        Optional<Partenaire> partenaireOptional = partenaireRepository.findById(userPayload.getPartenaireId());
+                        oldUser.setPartenaire(partenaireOptional.get());
+                    }
+
+                    oldUser.setUsername(userPayload.getEmail());
+                    oldUser.setPassword(bCryptPasswordEncoder.encode(userPayload.getPassword()));
+                    ApplicationUser userUpdate = applicationUserRepository.save(oldUser);
+                    return Response.success(userUpdate, "Utuilisateur modifié.");
+                } else {
+                    return Response.error(null, "Cet uilisateur n'existe pas.");
+                }
+            } else {
+                Client client = new Client();
+                ApplicationUser user = new ApplicationUser();
+                client.setNom(userPayload.getNom());
+                client.setEmail(userPayload.getEmail());
+                client.setPhone(userPayload.getPhone());
+                client.setPrenom(userPayload.getPrenom());
+                Client clientSaved = clientRepository.save(client);
+
+                if (userPayload.getPartenaireId() != null) {
+                    Optional<Partenaire> partenaireOptional = partenaireRepository.findById(userPayload.getPartenaireId());
+                   user.setPartenaire(partenaireOptional.get());
+                }
+
+                user.setClient(clientSaved);
+                user.setUsername(userPayload.getEmail());
+                user.setPassword(bCryptPasswordEncoder.encode(userPayload.getPassword()));
+                ApplicationUser userSaved = applicationUserRepository.save(user);
+                return Response.success(userSaved, "Utilisateur enregistré");
+            }
+        } catch (Exception e) {
+            return Response.error(e, "Erreur d'enregistrement");
+        }
+    }
+
+    public void sendEmail() throws MessagingException {
+        sendEmailService.sendEmail();
+    }
 }

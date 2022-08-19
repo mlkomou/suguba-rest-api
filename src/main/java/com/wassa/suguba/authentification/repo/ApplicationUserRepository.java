@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, Long> {
     Optional<ApplicationUser> findByUsername(String username);
-    Page<ApplicationUser> findAll(Pageable pageable);
+    Page<ApplicationUser> findAllBySupprime(boolean suprrime, Pageable pageable);
     List<ApplicationUser> findAllByType(String type);
     Optional<ApplicationUser> getApplicationUserByOneSignalUserId(String userId);
 }

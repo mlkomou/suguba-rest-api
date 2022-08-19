@@ -23,8 +23,10 @@ public class SouscriptionController {
     @PostMapping("/get_by_active")
     Map<String , Object> getSouscritionByActive(@RequestParam("page") int page,
                                                 @RequestParam("size") int size,
-                                                @RequestParam("active") boolean active) {
-        return souscriptionService.getSouscritonByStatut(page, size, active);
+                                                @RequestParam("active") boolean active,
+                                                @RequestParam("statut") String statut) {
+        System.err.println("statut " + statut);
+        return souscriptionService.getSouscritonByStatut(page, size, active, statut);
     }
 
     @GetMapping("/active/{id}/{statut}")
