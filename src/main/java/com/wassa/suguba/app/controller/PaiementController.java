@@ -1,5 +1,7 @@
 package com.wassa.suguba.app.controller;
 
+import com.wassa.suguba.app.payload.CommandeAndPayementPayload;
+import com.wassa.suguba.app.payload.PayementMarchandNotificationPayload;
 import com.wassa.suguba.app.payload.PaymentMarchandPayload;
 import com.wassa.suguba.app.service.PaiementService;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +28,12 @@ public class PaiementController {
         return paiementService.orangeMoneyPay();
     }
 
-    @PostMapping("/makePay")
-    public Map<String, Object> makePay(@RequestBody PaymentMarchandPayload payementPayload) {
-        return paiementService.makePayementMarchand(payementPayload);
+//    @PostMapping("/makePay")
+//    public Map<String, Object> makePay(@RequestBody CommandeAndPayementPayload payementPayload) {
+//        return paiementService.makePayementMarchand(payementPayload);
+//    }
+    @PostMapping("/payement_callback")
+    public void makePay(@RequestBody PayementMarchandNotificationPayload notificationPayload) {
+        paiementService.payementNotification(notificationPayload);
     }
 }

@@ -3,7 +3,7 @@ package com.wassa.suguba.app.payload;
 public class PaymentMarchandPayload {
     public String idFromClient;
     public AdditionalInfosPayload additionnalInfos;
-    public Integer amount;
+    public Double amount;
     public String callback;
     public String recipientNumber;
     public String serviceCode;
@@ -24,11 +24,11 @@ public class PaymentMarchandPayload {
         this.additionnalInfos = additionnalInfos;
     }
 
-    public Integer getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

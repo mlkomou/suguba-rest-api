@@ -30,6 +30,9 @@ public class Commande extends Generality{
 
    private Boolean receptionMe;
 
+   @ManyToOne
+   private PayementMarchandNotification payementMarchandNotification;
+
     public Boolean getReceptionMe() {
         return receptionMe;
     }
@@ -118,6 +121,14 @@ public class Commande extends Generality{
 
     public void setNumero(String numero) {
         this.numero = numero;
+    }
+
+    public PayementMarchandNotification getPayementMarchandNotification() {
+        return payementMarchandNotification;
+    }
+
+    public void setPayementMarchandNotification(PayementMarchandNotification payementMarchandNotification) {
+        this.payementMarchandNotification = payementMarchandNotification;
     }
 
     @Override

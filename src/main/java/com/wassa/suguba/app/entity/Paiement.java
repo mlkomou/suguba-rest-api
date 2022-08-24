@@ -8,6 +8,15 @@ import javax.persistence.*;
 public class Paiement extends Generality{
     String typePaiement;
     Double montant;
+    String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getTypePaiement() {
         return typePaiement;

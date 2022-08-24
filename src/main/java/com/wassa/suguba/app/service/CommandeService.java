@@ -14,11 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -35,8 +31,10 @@ public class CommandeService {
     private final PaiementRepository paiementRepository;
     private final ApplicationUserRepository applicationUserRepository;
     private final SouscritionRepository souscritionRepository;
+    private final PaiementService paiementService;
+    private final SendSmsService sendSmsService;
 
-    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService, PaiementRepository paiementRepository, ApplicationUserRepository applicationUserRepository, SouscritionRepository souscritionRepository) {
+    public CommandeService(CommandeRepository commandeRepository, ClientRepository clientRepository, LigneCommendeRepository ligneCommendeRepository, ProduitRepository produitRepository, NotificationService notificationService, SendEmailService sendEmailService, PaiementRepository paiementRepository, ApplicationUserRepository applicationUserRepository, SouscritionRepository souscritionRepository, PaiementService paiementService, SendSmsService sendSmsService) {
         this.commandeRepository = commandeRepository;
         this.clientRepository = clientRepository;
         this.ligneCommendeRepository = ligneCommendeRepository;
@@ -46,6 +44,8 @@ public class CommandeService {
         this.paiementRepository = paiementRepository;
         this.applicationUserRepository = applicationUserRepository;
         this.souscritionRepository = souscritionRepository;
+        this.paiementService = paiementService;
+        this.sendSmsService = sendSmsService;
     }
 
 
@@ -58,11 +58,12 @@ public class CommandeService {
        return sum;
    }
 
-    public ResponseEntity<Map<String, Object>> saveCommande(CommandePayload commandePayload) {
+    public ResponseEntity<Map<String, Object>> saveCommande(CommandeAndPayementPayload commandeAndPayementPayload) {
       try {
+          CommandePayload commandePayload = commandeAndPayementPayload.getCommandePayload();
           Optional<ApplicationUser> user = applicationUserRepository.findById(commandePayload.getUserId());
 
-          NotificationPayload notificationPayload = new NotificationPayload();
+//          NotificationPayload notificationPayload = new NotificationPayload();
             List<LigneCommande> ligneArray = new ArrayList();
             List<String> included_segments = new ArrayList<>();
             included_segments.add(commandePayload.getOneSignalNotificationId());
@@ -83,6 +84,7 @@ public class CommandeService {
             commande.setReceptionMe(commandePayload.getReceptionMe());
 
             if (commandePayload.getTypePaiement() != null) {
+                // choisir le service (orange ou moov) depuis le client
                 Paiement paiement = new Paiement();
                 ArrayList<Double> montantArr = new ArrayList();
                 commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
@@ -94,14 +96,10 @@ public class CommandeService {
 
                 paiement.setTypePaiement(commandePayload.getTypePaiement());
                 paiement.setMontant(calculSum(montantArr));
+                paiement.setStatus("INITIATED");
                 Paiement paiementSaved = paiementRepository.save(paiement);
                 commande.setPaiement(paiementSaved);
                 Commande commandeSaved = commandeRepository.save(commande);
-
-                notificationPayload.setCommandeId(commandeSaved.getId());
-                notificationPayload.setType("COMMANDE");
-                notificationPayload.setTitre("COMMANDE");
-                notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
 
                 commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
                     Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
@@ -112,9 +110,26 @@ public class CommandeService {
                     ligneArray.add(ligneCommande);
                 });
                 ligneCommendeRepository.saveAll(ligneArray);
+
+                // enregistrement du paiement a travers l'api
+                commandeAndPayementPayload.getPaymentMarchandPayload().setAmount(calculSum(montantArr));
+                commandeAndPayementPayload.getPaymentMarchandPayload().setIdFromClient(new Date().getTime() + "");
+                commandeAndPayementPayload.getPaymentMarchandPayload().setRecipientNumber(user.get().getUsername()); // à modifier: doit etre choisi depuis le client
+                commandeAndPayementPayload.getPaymentMarchandPayload().setCallback("https://vmi920689.contaboserver.net:8443/suguba/paiements/payement_callback");
+
+                paiementService.makePayementMarchand(commandeAndPayementPayload.getPaymentMarchandPayload(), commandeSaved);
+                // je dois implementer la verification de cet entregistrement
+
+
+
+//                notificationPayload.setCommandeId(commandeSaved.getId());
+//                notificationPayload.setType("COMMANDE");
+//                notificationPayload.setTitre("COMMANDE");
+//                notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
+
 //                notificationService.saveNotification(notificationPayload, included_segments);
-                System.out.println("commandeSaved: " + commandeSaved.toString());
-                return new ResponseEntity<>(Response.success(commandeSaved, "Commande enregistrée."), HttpStatus.OK);
+//                System.out.println("commandeSaved: " + commandeSaved.toString());
+                return new ResponseEntity<>(Response.success(commandeSaved, "Votre commande est en cours de traitement. Vous recevrez un message sur l'état de votre commande."), HttpStatus.OK);
 
             } else {
                 Souscrition souscrition = souscritionRepository.findByUserIdAndActive(commandePayload.getUserId(), true);
@@ -133,10 +148,10 @@ public class CommandeService {
 
                         Commande commandeSaved = commandeRepository.save(commande);
 
-                        notificationPayload.setCommandeId(commandeSaved.getId());
-                        notificationPayload.setType("COMMANDE");
-                        notificationPayload.setTitre("COMMANDE");
-                        notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
+//                        notificationPayload.setCommandeId(commandeSaved.getId());
+//                        notificationPayload.setType("COMMANDE");
+//                        notificationPayload.setTitre("COMMANDE");
+//                        notificationPayload.setDescription("Votre commande est en traitement, nous vous contacterons dans peu de temps.");
 
                         commandePayload.getLigneQuantites().forEach(ligneQuantite -> {
                             Optional<Produit> produit = produitRepository.findById(ligneQuantite.idProduit);
@@ -148,19 +163,23 @@ public class CommandeService {
                         });
                         ligneCommendeRepository.saveAll(ligneArray);
 //                        notificationService.saveNotification(notificationPayload, included_segments);
-                        return new ResponseEntity<>(Response.success(commandeSaved, "Commande enregistrée."), HttpStatus.OK);
+                        sendSmsService.sendSmsSingle(user.get().getUsername(), "Commande est cours de traitement, vous recevrez un message de validation.");
+                        return new ResponseEntity<>(Response.success(commandeSaved, "Commande est cours de traitement, vous recevrez un message de validation."), HttpStatus.OK);
                     } else {
-                        System.err.println("MontantTotal: " + calculSum(montantArr));
-                        System.err.println("MontantSouscription: " + souscrition.getMontant());
-                        return new ResponseEntity<>(Response.error(souscrition, "Le solde de votre souscription est insuffisant pour cette commande"), HttpStatus.OK);
+//                        System.err.println("MontantTotal: " + calculSum(montantArr));
+//                        System.err.println("MontantSouscription: " + souscrition.getMontant());
+                        return new ResponseEntity<>(Response.error(souscrition, "Le solde de votre souscription est insuffisant pour cette commande."), HttpStatus.OK);
                     }
                 }
             }
-          return new ResponseEntity<>(Response.success(commande, "Commande enregistrée"), HttpStatus.OK);
+          sendSmsService.sendSmsSingle(user.get().getUsername(), "Commande est cours de traitement, vous recevrez un message de validation.");
+          return new ResponseEntity<>(Response.success(commande, "Commande est cours de traitement, vous recevrez un message de validation."), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(Response.error(e, "Erreur d'enregistrement de la commande."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     public Map<String, Object> updateCommandeWithoutFile(Commande commande) {
         try {

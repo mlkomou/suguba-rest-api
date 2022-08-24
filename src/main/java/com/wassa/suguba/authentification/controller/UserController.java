@@ -2,6 +2,7 @@ package com.wassa.suguba.authentification.controller;
 
 import com.wassa.suguba.app.entity.PhoneVerification;
 import com.wassa.suguba.app.payload.AdminUserPayload;
+import com.wassa.suguba.app.payload.SouscriptionAndPhoneNumbers;
 import com.wassa.suguba.app.payload.SouscriptionPayload;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
@@ -45,8 +46,13 @@ public class UserController {
     }
 
     @PostMapping("/signupSouscription")
-    Map<String, Object> signupSouscription(@RequestBody SouscriptionPayload souscriptionPayload) {
+    Map<String, Object> signupSouscription(@RequestBody SouscriptionAndPhoneNumbers souscriptionPayload) {
         return authService.signupSouscription(souscriptionPayload);
+    }
+
+    @GetMapping("/current-user/{userId}")
+    ResponseEntity<Map<String, Object>> getCurrentUser(@PathVariable Long userId) {
+        return authService.getCurrentUser(userId);
     }
 
     @PostMapping("/souscriptionInApp")

@@ -4,8 +4,17 @@ public class SouscriptionPayload {
     Double montant;
     String statut;
     String phone;
+    String phone2;
     String nomService;
     public Long userId;
+
+    public String getPhone2() {
+        return phone2;
+    }
+
+    public void setPhone2(String phone2) {
+        this.phone2 = phone2;
+    }
 
     public Long getUserId() {
         return userId;

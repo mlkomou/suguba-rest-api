@@ -7,6 +7,7 @@ import javax.persistence.*;
 @Access(AccessType.FIELD)
 public class Client extends Generality{
     String phone;
+    String phone2;
     String nom;
     String prenom;
     String email;
@@ -15,6 +16,14 @@ public class Client extends Generality{
     private String entreprise;
     @ManyToOne
     private Partenaire partenaire;
+
+    public String getPhone2() {
+        return phone2;
+    }
+
+    public void setPhone2(String phone2) {
+        this.phone2 = phone2;
+    }
 
     public Partenaire getPartenaire() {
         return partenaire;

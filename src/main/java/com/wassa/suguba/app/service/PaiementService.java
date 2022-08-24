@@ -3,11 +3,13 @@ package com.wassa.suguba.app.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
-import com.wassa.suguba.app.entity.AdditionalInfo;
-import com.wassa.suguba.app.entity.PayementMarchand;
+import com.wassa.suguba.app.entity.*;
 import com.wassa.suguba.app.payload.*;
 import com.wassa.suguba.app.repository.AdditionalInfoRepository;
+import com.wassa.suguba.app.repository.PaiementRepository;
+import com.wassa.suguba.app.repository.PayementMarchandNotificationRepository;
 import com.wassa.suguba.app.repository.PayementMarchandRepository;
+import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -27,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
 import java.util.Map;
@@ -35,10 +38,16 @@ import java.util.Map;
 public class PaiementService {
     private final PayementMarchandRepository payementMarchandRepository;
     private final AdditionalInfoRepository additionalInfoRepository;
+    private final PaiementRepository paiementRepository;
+    private final PayementMarchandNotificationRepository payementMarchandNotificationRepository;
+    private final SendSmsService sendSmsService;
 
-    public PaiementService(PayementMarchandRepository payementMarchandRepository, AdditionalInfoRepository additionalInfoRepository) {
+    public PaiementService(PayementMarchandRepository payementMarchandRepository, AdditionalInfoRepository additionalInfoRepository, PaiementRepository paiementRepository, PayementMarchandNotificationRepository payementMarchandNotificationRepository, SendSmsService sendSmsService) {
         this.payementMarchandRepository = payementMarchandRepository;
         this.additionalInfoRepository = additionalInfoRepository;
+        this.paiementRepository = paiementRepository;
+        this.payementMarchandNotificationRepository = payementMarchandNotificationRepository;
+        this.sendSmsService = sendSmsService;
     }
 
     public Map<String, Object> getBalance() throws IOException {
@@ -108,11 +117,23 @@ public class PaiementService {
         return provider;
     }
 
-   public Map<String, Object> makePayementMarchand(PaymentMarchandPayload payementPayload) {
+   public void makePayementMarchand(PaymentMarchandPayload payementPayload, Commande commande) {
         try {
+            AdditionalInfosPayload additionalInfosPayload = new AdditionalInfosPayload();
+            ApplicationUser user = commande.getUser();
+
+            additionalInfosPayload.setDestinataire(user.getUsername());
+            additionalInfosPayload.setRecipientFirstName(user.getUsername());
+            additionalInfosPayload.setRecipientLastName(user.getUsername());
+            additionalInfosPayload.setRecipientEmail(user.getUsername());
+
+            payementPayload.setAdditionnalInfos(additionalInfosPayload);
+
+
             ///// Digest auth
             HttpClient httpClient = HttpClientBuilder.create().
                     setDefaultCredentialsProvider(provider()).useSystemProperties().build();
+//            HttpPut httpPost = new HttpPut("https://api.gutouch.com/dist/api/touchpayapi/v1/MTC2607/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
             HttpPut httpPost = new HttpPut("https://api.gutouch.com/dist/api/touchpayapi/v1/MTCSU6019/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
             httpPost.setHeader("Content-type", "application/json");
             httpPost.setHeader("Accept", "application/json");
@@ -124,8 +145,9 @@ public class PaiementService {
             httpPost.getRequestLine();
             httpPost.setEntity(stringEntity);
 
-            HttpResponse response =   httpClient.execute(httpPost);
+            HttpResponse response = httpClient.execute(httpPost);
             String responseString = new BasicResponseHandler().handleResponse(response);
+            System.out.println("responseString: " + responseString);
             PaymentMarchandResponse paymentMarchandResponse = new ObjectMapper().readValue(responseString, PaymentMarchandResponse.class);
             if (Objects.equals(paymentMarchandResponse.status, "INITIATED")) {
                 AdditionalInfo additionalInfo = new AdditionalInfo();
@@ -142,21 +164,44 @@ public class PaiementService {
                 payementMarchandToSave.setAdditionnalInfos(additionalInfoSaved);
                 payementMarchandToSave.setIdFromClient(payementPayload.getIdFromClient());
                 payementMarchandToSave.setRecipientNumber(payementPayload.getRecipientNumber());
-                PayementMarchand payementMarchand = payementMarchandRepository.save(payementMarchandToSave);
-                return Response.success(payementMarchand, "Payement done.");
-            }
+                payementMarchandToSave.setCommande(commande);
 
-            return Response.success(paymentMarchandResponse, "Payement done.");
+                payementMarchandRepository.save(payementMarchandToSave);
+                sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande est en cours de traitement, nous vous enverrons un message de confirmation. SUGUBA vous remercie.");
+            }
         } catch (Exception e) {
             System.err.println(e);
-            return Response.error(e, "erreur");
         }
     }
 
     public void payementNotification(PayementMarchandNotificationPayload payementMarchandNotificationPayload) {
             try {
+                Commande commandeToUpdate = null;
+                Optional<PayementMarchand> payementMarchandOptional = payementMarchandRepository.findByIdFromClient(payementMarchandNotificationPayload.getPartner_transaction_id());
+                PayementMarchandNotification payementMarchandNotification = new PayementMarchandNotification();
+                payementMarchandNotification.setService_id(payementMarchandNotificationPayload.getService_id());
+                payementMarchandNotification.setCall_back_url(payementMarchandNotificationPayload.getCall_back_url());
+                payementMarchandNotification.setGu_transaction_id(payementMarchandNotificationPayload.getGu_transaction_id());
+                payementMarchandNotification.setPartner_transaction_id(payementMarchandNotificationPayload.getPartner_transaction_id());
+                payementMarchandNotification.setStatus(payementMarchandNotificationPayload.getStatus());
 
-            } catch (Exception e) {
+                if (payementMarchandOptional.isPresent()) {
+                    PayementMarchand payementMarchand = payementMarchandOptional.get();
+                    Commande commande = payementMarchand.getCommande();
+                    commandeToUpdate = payementMarchand.getCommande();
+                    Paiement paiement = commande.getPaiement();
+                    paiement.setStatus(payementMarchandNotificationPayload.getStatus());
+                    paiementRepository.save(paiement);
+
+                    if (Objects.equals(payementMarchandNotificationPayload.getStatus(), "SUCCESSFUL")) {
+                        sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande est effectué avec succès, nous vous contacterons pour la livraison. SUGUBA vous remercie.");
+                    } else {
+                        sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande a échoué, vous devez vérifier si le solde votre compte est suffisant. SUGUBA vous remercie.");
+                    }
+                }
+                payementMarchandNotification.setCommande(commandeToUpdate);
+                payementMarchandNotificationRepository.save(payementMarchandNotification);
+            } catch (Exception ignored) {
 
             }
     }

@@ -12,10 +12,20 @@ public class PayementMarchand extends Generality {
     public String idFromClient;
     @ManyToOne
     public AdditionalInfo additionnalInfos;
-    public Integer amount;
+    public Double amount;
     public String callback;
     public String recipientNumber;
     public String serviceCode;
+    @ManyToOne
+    public Commande commande;
+
+    public Commande getCommande() {
+        return commande;
+    }
+
+    public void setCommande(Commande commande) {
+        this.commande = commande;
+    }
 
     public String getIdFromClient() {
         return idFromClient;
@@ -33,11 +43,11 @@ public class PayementMarchand extends Generality {
         this.additionnalInfos = additionnalInfos;
     }
 
-    public Integer getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

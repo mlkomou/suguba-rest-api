@@ -47,8 +47,9 @@ public class AuthService {
     private final PartenaireRepository partenaireRepository;
     private final DemandeSouscriptionRepository demandeSouscriptionRepository;
     private final SendEmailService sendEmailService;
+    private final PhoneNumbersRepository phoneNumbersRepository;
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService) {
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
@@ -59,6 +60,7 @@ public class AuthService {
         this.partenaireRepository = partenaireRepository;
         this.demandeSouscriptionRepository = demandeSouscriptionRepository;
         this.sendEmailService = sendEmailService;
+        this.phoneNumbersRepository = phoneNumbersRepository;
     }
 
     public ResponseEntity<Map<String, Object>> loginUser(ApplicationUser applicationUser) {
@@ -86,6 +88,19 @@ public class AuthService {
         } catch (Exception e) {
             System.err.println("auth error: " + e);
             return new ResponseEntity<>(Response.error(e, "Authentification échouée"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Map<String, Object>> getCurrentUser(Long userId) {
+        try {
+            Optional<ApplicationUser> user = applicationUserRepository.findById(userId);
+            if (user.isPresent()) {
+                return new ResponseEntity<>(Response.success(user, "Utilisateur courant"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(Response.error(user, "Utilisateur enexistant."), HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(Response.success(e, "Utilisateur courant"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -168,8 +183,9 @@ public class AuthService {
         }
   }
 
-    public Map<String, Object> signupSouscription(SouscriptionPayload souscriptionPayload) {
+    public Map<String, Object> signupSouscription(SouscriptionAndPhoneNumbers souscriptionAndPhoneNumbers) {
         try {
+            SouscriptionPayload souscriptionPayload = souscriptionAndPhoneNumbers.getSouscriptionPayload();
             UserConnected userConnected = new UserConnected();
             Client client = new Client();
             client.setPhone(souscriptionPayload.getPhone());
@@ -186,6 +202,18 @@ public class AuthService {
             ApplicationUser userSaved = applicationUserRepository.save(user);
             userConnected.setApplicationUser(userSaved);
             userConnected.setToken(getToken(userToAuth));
+
+            List<PhoneNumbers> phoneNumbersList = new ArrayList<>();
+            souscriptionAndPhoneNumbers.getPhoneNumbers().forEach(phoneNumbers -> {
+                phoneNumbers.setUser(userSaved);
+                phoneNumbersList.add(phoneNumbers);
+            });
+            PhoneNumbers phoneNumbersPrincipal = new PhoneNumbers();
+            phoneNumbersPrincipal.setUser(userSaved);
+            phoneNumbersPrincipal.setPhone(userSaved.getUsername());
+            phoneNumbersList.add(phoneNumbersPrincipal);
+
+            phoneNumbersRepository.saveAll(phoneNumbersList);
 
             if (Objects.equals(souscriptionPayload.getStatut(), "Oui")) {
                 Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByUserIdAndStatut(userSaved.getId(), "TRAITEMENT");

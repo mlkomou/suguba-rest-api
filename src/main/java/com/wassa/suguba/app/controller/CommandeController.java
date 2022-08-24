@@ -2,10 +2,7 @@ package com.wassa.suguba.app.controller;
 
 import com.wassa.suguba.app.constante.UploadPath;
 import com.wassa.suguba.app.entity.Commande;
-import com.wassa.suguba.app.payload.CommandePDFExporter;
-import com.wassa.suguba.app.payload.CommandePayload;
-import com.wassa.suguba.app.payload.IntervalleDate;
-import com.wassa.suguba.app.payload.UpdateStatut;
+import com.wassa.suguba.app.payload.*;
 import com.wassa.suguba.app.service.CommandeService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -45,7 +42,7 @@ public class CommandeController {
     }
 
     @PostMapping()
-    public ResponseEntity<Map<String, Object>> saveCommande(@RequestBody CommandePayload commande) {
+    public ResponseEntity<Map<String, Object>> saveCommande(@RequestBody CommandeAndPayementPayload commande) {
         return commandeService.saveCommande(commande);
     }
 

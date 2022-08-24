@@ -2,15 +2,15 @@ package com.wassa.suguba.authentification.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.wassa.suguba.app.entity.Client;
-import com.wassa.suguba.app.entity.Entreprise;
-import com.wassa.suguba.app.entity.Partenaire;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.wassa.suguba.app.entity.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class ApplicationUser {
@@ -28,10 +28,24 @@ public class ApplicationUser {
     @ManyToOne
     Client client;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties(value = {"user"}, allowSetters = true)
+    private List<PhoneNumbers> phoneNumbers;
+
+    public List<PhoneNumbers> getPhoneNumbers() {
+        return phoneNumbers;
+    }
+
+    public void setPhoneNumbers(List<PhoneNumbers> phoneNumbers) {
+        this.phoneNumbers = phoneNumbers;
+    }
+
     @ManyToOne
     private Partenaire servicePaiement;
 
     private Boolean supprime = true;
+
+
 
 
     @CreatedBy
