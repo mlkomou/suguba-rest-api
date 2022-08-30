@@ -232,15 +232,25 @@ public class CommandeService {
 
     public Map<String, Object> getCommandeById(Long id) {
         try {
-            List<Commande> commandes = commandeRepository.findAllById(id);
-//            Optional<Commande> commandeOptional = commandeRepository.findById(id);
+            List<Commande> commandes = commandeRepository.getAllByUserId(id);
             if (!commandes.isEmpty()) {
-                return Response.success(commandes, "commande trouvée.");
+                return Response.success(commandes.size(), "commande trouvée.");
             } else {
                 return Response.error(new ArrayList<>(), "Cette commande n'existe pas.");
             }
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de commande.");
+        }
+    }
+
+    public Map<String, Object> getCommandeByUser(Long userId, int page, int size) {
+        try {
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
+            Page<Commande> commandes = commandeRepository.findAllByUserId(userId, paging);
+            return Response.success(commandes, "Liste des commandes");
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de récupération");
         }
     }
 

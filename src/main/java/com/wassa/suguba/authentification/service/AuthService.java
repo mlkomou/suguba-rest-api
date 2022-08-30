@@ -5,6 +5,7 @@ import com.wassa.suguba.app.payload.*;
 import com.wassa.suguba.app.repository.*;
 import com.wassa.suguba.app.service.SendEmailService;
 import com.wassa.suguba.app.service.SendSmsService;
+import com.wassa.suguba.app.service.UploadFileService;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
 import com.wassa.suguba.authentification.entity.UserConnected;
@@ -25,12 +26,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.wassa.suguba.app.constante.UploadPath.PIECE_DOWNLOAD_LINK;
+import static com.wassa.suguba.app.constante.UploadPath.SIGNATURE_DOWNLOAD_LINK;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.EXPIRATION_TIME;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.KEY;
 
@@ -48,8 +53,10 @@ public class AuthService {
     private final DemandeSouscriptionRepository demandeSouscriptionRepository;
     private final SendEmailService sendEmailService;
     private final PhoneNumbersRepository phoneNumbersRepository;
+    private final UploadFileService uploadFileService;
+    private final FilesRepository filesRepository;
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository) {
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository, UploadFileService uploadFileService, FilesRepository filesRepository) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
@@ -61,6 +68,8 @@ public class AuthService {
         this.demandeSouscriptionRepository = demandeSouscriptionRepository;
         this.sendEmailService = sendEmailService;
         this.phoneNumbersRepository = phoneNumbersRepository;
+        this.uploadFileService = uploadFileService;
+        this.filesRepository = filesRepository;
     }
 
     public ResponseEntity<Map<String, Object>> loginUser(ApplicationUser applicationUser) {
@@ -183,12 +192,15 @@ public class AuthService {
         }
   }
 
-    public Map<String, Object> signupSouscription(SouscriptionAndPhoneNumbers souscriptionAndPhoneNumbers) {
+    public Map<String, Object> signupSouscription(SouscriptionAndPhoneNumbers souscriptionAndPhoneNumbers, MultipartFile identiteFile, MultipartFile signatureFile) {
         try {
             SouscriptionPayload souscriptionPayload = souscriptionAndPhoneNumbers.getSouscriptionPayload();
             UserConnected userConnected = new UserConnected();
             Client client = new Client();
             client.setPhone(souscriptionPayload.getPhone());
+            client.setPrenom(souscriptionPayload.getPrenom());
+            client.setNom(souscriptionPayload.getNom());
+            client.setAdresse(souscriptionPayload.getAdresse());
             Client clientSaved = clientRepository.save(client);
 
             ApplicationUser user = new ApplicationUser();
@@ -215,21 +227,30 @@ public class AuthService {
 
             phoneNumbersRepository.saveAll(phoneNumbersList);
 
+            // inscription avec souscription (oui)
             if (Objects.equals(souscriptionPayload.getStatut(), "Oui")) {
                 Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByUserIdAndStatut(userSaved.getId(), "TRAITEMENT");
                 if (demandeSouscriptionOptional.isPresent()) {
+                    //une ancienne souscription en cours
                     DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
                     demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
+                    demandeSouscription.setNomService(demandeSouscription.getNomService());
                     demandeSouscriptionRepository.save(demandeSouscription);
 
                     return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
                 }
 
+                // nouvelle souscription
                 DemandeSouscription souscrition = new DemandeSouscription();
-//                souscrition.setNomService(souscriptionPayload.getNomService());
+                souscrition.setAdresseBanque(souscrition.getAdresseBanque());
                 souscrition.setMontant(souscriptionPayload.getMontant());
                 souscrition.setUser(userSaved);
                 souscrition.setStatut("TRAITEMENT");
+                souscrition.setNomService(souscriptionPayload.getNomService());
+                souscrition.setCivilite(souscriptionPayload.getCivilite());
+                souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                 demandeSouscriptionRepository.save(souscrition);
 
                 return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");

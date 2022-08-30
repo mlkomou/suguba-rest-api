@@ -14,6 +14,42 @@ public class DemandeSouscription extends Generality{
     private ApplicationUser user;
     private String statut;
     private String nomService;
+    private String civilite;
+    private String adresseBanque;
+    private String identitePath;
+    private String signaturePath;
+
+    public String getAdresseBanque() {
+        return adresseBanque;
+    }
+
+    public void setAdresseBanque(String adresseBanque) {
+        this.adresseBanque = adresseBanque;
+    }
+
+    public String getIdentitePath() {
+        return identitePath;
+    }
+
+    public void setIdentitePath(String identitePath) {
+        this.identitePath = identitePath;
+    }
+
+    public String getSignaturePath() {
+        return signaturePath;
+    }
+
+    public void setSignaturePath(String signaturePath) {
+        this.signaturePath = signaturePath;
+    }
+
+    public String getCivilite() {
+        return civilite;
+    }
+
+    public void setCivilite(String civilite) {
+        this.civilite = civilite;
+    }
 
     public String getNomService() {
         return nomService;

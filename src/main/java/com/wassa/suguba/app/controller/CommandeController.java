@@ -86,6 +86,11 @@ public class CommandeController {
     public Map<String, Object> exportToPDF(@RequestBody IntervalleDate intervalleDate, HttpServletResponse response) {
        return commandeService.exportToPDF(intervalleDate, response);
     }
+
+    @GetMapping("/page-by-user/{userId}/{page}/{size}")
+    public Map<String, Object> getByUser(@PathVariable Long userId, @PathVariable int page, @PathVariable int size) {
+        return commandeService.getCommandeByUser(userId, page, size);
+    }
 //    public void exportToPDF(HttpServletResponse response) throws DocumentException, IOException {
 //        response.setContentType("application/pdf");
 //        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

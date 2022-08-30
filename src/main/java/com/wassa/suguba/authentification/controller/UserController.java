@@ -1,5 +1,8 @@
 package com.wassa.suguba.authentification.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wassa.suguba.app.entity.Banque;
 import com.wassa.suguba.app.entity.PhoneVerification;
 import com.wassa.suguba.app.payload.AdminUserPayload;
 import com.wassa.suguba.app.payload.SouscriptionAndPhoneNumbers;
@@ -10,8 +13,10 @@ import com.wassa.suguba.authentification.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,8 +51,14 @@ public class UserController {
     }
 
     @PostMapping("/signupSouscription")
-    Map<String, Object> signupSouscription(@RequestBody SouscriptionAndPhoneNumbers souscriptionPayload) {
-        return authService.signupSouscription(souscriptionPayload);
+    Map<String, Object> signupSouscription(
+                                           @RequestParam("souscriptionPayload") String souscriptionPayloadString,
+                                           @RequestParam("identiteFile") MultipartFile identiteFile,
+                                           @RequestParam("signatureFile") MultipartFile signatureFile) throws JsonProcessingException {
+
+//        @RequestBody SouscriptionAndPhoneNumbers souscriptionPayload,
+        SouscriptionAndPhoneNumbers souscriptionPayload = new ObjectMapper().readValue(souscriptionPayloadString, SouscriptionAndPhoneNumbers.class);
+        return authService.signupSouscription(souscriptionPayload, identiteFile, signatureFile);
     }
 
     @GetMapping("/current-user/{userId}")

@@ -4,16 +4,53 @@ public class SouscriptionPayload {
     Double montant;
     String statut;
     String phone;
-    String phone2;
+
     String nomService;
     public Long userId;
+    public String civilite;
+    public String prenom;
+    public String nom;
+    public String adresse;
+    public String adresseBanque;
 
-    public String getPhone2() {
-        return phone2;
+    public String getPrenom() {
+        return prenom;
     }
 
-    public void setPhone2(String phone2) {
-        this.phone2 = phone2;
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
+    }
+
+    public String getAdresseBanque() {
+        return adresseBanque;
+    }
+
+    public void setAdresseBanque(String adresseBanque) {
+        this.adresseBanque = adresseBanque;
+    }
+
+    public String getCivilite() {
+        return civilite;
+    }
+
+    public void setCivilite(String civilite) {
+        this.civilite = civilite;
     }
 
     public Long getUserId() {

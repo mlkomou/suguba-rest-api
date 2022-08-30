@@ -7,22 +7,22 @@ import javax.persistence.*;
 @Access(AccessType.FIELD)
 public class Client extends Generality{
     String phone;
-    String phone2;
     String nom;
     String prenom;
     String email;
     String namePath;
     String phonePath;
+    String adresse;
     private String entreprise;
     @ManyToOne
     private Partenaire partenaire;
 
-    public String getPhone2() {
-        return phone2;
+    public String getAdresse() {
+        return adresse;
     }
 
-    public void setPhone2(String phone2) {
-        this.phone2 = phone2;
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
     public Partenaire getPartenaire() {

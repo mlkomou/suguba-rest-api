@@ -16,6 +16,9 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
 
     List<Commande> findAllById(Long id);
 
+    Page<Commande> findAllByUserId(Long user_id, Pageable pageable);
+    List<Commande> getAllByUserId(Long user_id);
+
     @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate AND c.user.servicePaiement.id = :partenaireId")
     Page<Commande> getByRangeDate(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, @Param("partenaireId") Long partenaireId, Pageable pageable);
     @Query(value = "from Commande c where c.createdAt BETWEEN :startDate AND :endDate")
