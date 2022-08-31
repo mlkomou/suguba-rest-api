@@ -263,7 +263,7 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload) {
+    public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload, MultipartFile identiteFile, MultipartFile signatureFile) {
         try {
             Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
             if (user.isPresent()) {
@@ -272,6 +272,10 @@ public class AuthService {
                 if (demandeSouscriptionOptional.isPresent()) {
                     DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
                     demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    demandeSouscription.setNomService(souscriptionPayload.getNomService());
+                    demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
                     //enregistrement de la demande de souscription
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
@@ -360,9 +364,7 @@ public class AuthService {
     public Map<String, Object> sendconfirmationCode(String phone) {
         try {
             Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
-//            SmsContent smsContent = new SmsContent();
-//            List<SmsContent> smsContentList = new ArrayList<>();
-//            SendSms sms = new SendSms();
+
             if (phoneVerificationOptional.isPresent()) {
                 String codeConf = makePassword(4);
 
@@ -383,45 +385,14 @@ public class AuthService {
                 phoneVerificationRepository.save(phoneVerification);
                 SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
 
-
-
-//                smsContent.setTo("+223" + phone);
-//                smsContent.setMessage(codeConf + " " + "est votre de vérification pour SUGUBA.");
-//                smsContentList.add(smsContent);
-//                sms.setMessages(smsContentList);
-//                sms.setSender_id("SUGUBA");
-//
-//                PhoneVerification phoneVerification = phoneVerificationOptional.get();
-//                phoneVerification.setVerificationCode(codeConf);
                 phoneVerificationRepository.save(phoneVerification);
-//                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
 
                 if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
                     return Response.success(smsMessageResponse, "Code envoyé");
                 } else {
                     return Response.error(smsMessageResponse, "Erreur d'envoie du code");
                 }
-//                SmsObject smsObject = new SmsObject();
-//                List<Smses> smses = new ArrayList<>();
-//                Smses smses1 = new Smses();
-//                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
-//                smses1.setPhoneNumber("+223" + phone);
-//                smses.add(smses1);
-//
-//                smsObject.setLogin("kamara");
-//                smsObject.setPassword("Bengaly2021!");
-//                smsObject.setSenderId("WASSA PAY");
-//                smsObject.setSmses(smses);
 
-//                PhoneVerification phoneVerification = phoneVerificationOptional.get();
-//                phoneVerification.setVerificationCode(codeConf);
-//                phoneVerificationRepository.save(phoneVerification);
-//                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
-//                if (Objects.equals(smsMessageResponse.getData().get(0).getStatus(), "OK")) {
-//                    return Response.success(smsMessageResponse, "Code envoyé");
-//                } else {
-//                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
-//                }
             } else {
                 String codeConf = makePassword(4);
                 SmsObject smsObject = new SmsObject();
@@ -436,37 +407,17 @@ public class AuthService {
                 smsObject.setSenderId("WASSA PAY");
                 smsObject.setSmses(smses);
 
-
-
-//                smsContent.setTo("+223" + phone);
-//                smsContent.setMessage(codeConf + " " + "est votre code de vérification pour SUGUBA.");
-//                smsContentList.add(smsContent);
-//                sms.setMessages(smsContentList);
-//                sms.setSender_id("SUGUBA");
-
                 PhoneVerification phoneVerification = new PhoneVerification();
                 phoneVerification.setVerificationCode(codeConf);
                 phoneVerification.setPhone(phone);
                 phoneVerificationRepository.save(phoneVerification);
 
                 SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
-//                SmsResponse smsResponse = sendSmsService.sendSimpleSMs(sms);
                 if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
                     return Response.success(smsMessageResponse, "Code envoyé");
                 } else {
                     return Response.error(smsMessageResponse, "Erreur d'envoie du code");
                 }
-
-//                PhoneVerification phoneVerification = new PhoneVerification();
-//                phoneVerification.setVerificationCode(codeConf);
-//                phoneVerification.setPhone(phone);
-//                phoneVerificationRepository.save(phoneVerification);
-//                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
-//                if (Objects.equals(smsMessageResponse.getData().get(0).getStatus(), "OK")) {
-//                    return Response.success(smsMessageResponse, "Code envoyé");
-//                } else {
-//                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
-//                }
             }
         } catch (Exception e) {
             return Response.error(e, "Erreur d'envoie du code");
@@ -483,7 +434,8 @@ public class AuthService {
                 UserConnected userConnected = checkUser(user);
                 return new ResponseEntity<>(Response.success(userConnected, "Vérification réussie"), HttpStatus.OK);
             } else {
-                return new ResponseEntity<>(Response.success(phoneVerification, "Vérification échouée."), HttpStatus.OK);
+                phoneVerification.setId(0L);
+                return new ResponseEntity<>(Response.success(phoneVerification, "Vérification échouée, le code n'est pas correct."), HttpStatus.OK);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(Response.error(e, "Erreur de vérification."), HttpStatus.INTERNAL_SERVER_ERROR);

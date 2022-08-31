@@ -67,8 +67,12 @@ public class UserController {
     }
 
     @PostMapping("/souscriptionInApp")
-    ResponseEntity<Map<String, Object>> souscriptionInApp(@RequestBody SouscriptionPayload souscriptionPayload) {
-        return authService.souscriptionInApp(souscriptionPayload);
+    ResponseEntity<Map<String, Object>> souscriptionInApp(@RequestParam("souscriptionPayload") String souscriptionPayloadString,
+                                                          @RequestParam("identiteFile") MultipartFile identiteFile,
+                                                          @RequestParam("signatureFile") MultipartFile signatureFile) throws JsonProcessingException {
+        SouscriptionPayload souscriptionPayload = new ObjectMapper().readValue(souscriptionPayloadString, SouscriptionPayload.class);
+
+        return authService.souscriptionInApp(souscriptionPayload, identiteFile, signatureFile);
     }
 
     @PostMapping("/page")
