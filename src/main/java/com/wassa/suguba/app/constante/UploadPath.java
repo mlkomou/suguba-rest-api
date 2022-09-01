@@ -20,5 +20,7 @@ public class UploadPath {
 //    public static final String BANQUE_DOWNLOAD_LINK = "/var/www/suguba/banque";
 //    public static final String PRODUIT_DOWNLOAD_LINK = "/var/www/suguba/produit";
 //    public static final String LOGO_DOWNLOAD_LINK = "/var/www/suguba/logo";
+//    public static final String PIECE_DOWNLOAD_LINK = "/var/www/suguba/pieces";
+//    public static final String SIGNATURE_DOWNLOAD_LINK = "/var/www/suguba/signatures";
 
 }

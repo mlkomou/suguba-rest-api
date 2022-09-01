@@ -16,8 +16,26 @@ public class DemandeSouscription extends Generality{
     private String nomService;
     private String civilite;
     private String adresseBanque;
+    private String numeroCompteBanque;
     private String identitePath;
     private String signaturePath;
+    private String agenceDomiciliation;
+
+    public String getAgenceDomiciliation() {
+        return agenceDomiciliation;
+    }
+
+    public void setAgenceDomiciliation(String agenceDomiciliation) {
+        this.agenceDomiciliation = agenceDomiciliation;
+    }
+
+    public String getNumeroCompteBanque() {
+        return numeroCompteBanque;
+    }
+
+    public void setNumeroCompteBanque(String numeroCompteBanque) {
+        this.numeroCompteBanque = numeroCompteBanque;
+    }
 
     public String getAdresseBanque() {
         return adresseBanque;

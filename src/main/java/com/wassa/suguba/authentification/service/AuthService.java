@@ -235,7 +235,11 @@ public class AuthService {
                     DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
                     demandeSouscription.setMontant(souscriptionPayload.getMontant());
                     demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
-                    demandeSouscription.setNomService(demandeSouscription.getNomService());
+                    demandeSouscription.setNomService(souscriptionPayload.getNomService());
+                    demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
+                    demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscriptionRepository.save(demandeSouscription);
 
                     return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
@@ -249,6 +253,8 @@ public class AuthService {
                 souscrition.setStatut("TRAITEMENT");
                 souscrition.setNomService(souscriptionPayload.getNomService());
                 souscrition.setCivilite(souscriptionPayload.getCivilite());
+                souscrition.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
+                souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                 souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                 souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                 demandeSouscriptionRepository.save(souscrition);
@@ -274,6 +280,8 @@ public class AuthService {
                     demandeSouscription.setMontant(souscriptionPayload.getMontant());
                     demandeSouscription.setNomService(souscriptionPayload.getNomService());
                     demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
+                    demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
+                    demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
@@ -282,6 +290,12 @@ public class AuthService {
                 } else {
                     DemandeSouscription demandeSouscription = new DemandeSouscription();
                     demandeSouscription.setMontant(souscriptionPayload.getMontant());
+                    demandeSouscription.setNomService(souscriptionPayload.getNomService());
+                    demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
+                    demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
+                    demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscription.setStatut("TRAITEMENT");
                     demandeSouscription.setUser(user.get());
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);

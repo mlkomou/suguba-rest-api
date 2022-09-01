@@ -53,8 +53,8 @@ public class UserController {
     @PostMapping("/signupSouscription")
     Map<String, Object> signupSouscription(
                                            @RequestParam("souscriptionPayload") String souscriptionPayloadString,
-                                           @RequestParam("identiteFile") MultipartFile identiteFile,
-                                           @RequestParam("signatureFile") MultipartFile signatureFile) throws JsonProcessingException {
+                                           @RequestParam(value = "identiteFile", required = false) MultipartFile identiteFile,
+                                           @RequestParam(value = "signatureFile", required = false) MultipartFile signatureFile) throws JsonProcessingException {
 
 //        @RequestBody SouscriptionAndPhoneNumbers souscriptionPayload,
         SouscriptionAndPhoneNumbers souscriptionPayload = new ObjectMapper().readValue(souscriptionPayloadString, SouscriptionAndPhoneNumbers.class);

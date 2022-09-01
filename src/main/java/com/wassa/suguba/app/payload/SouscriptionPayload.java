@@ -12,6 +12,24 @@ public class SouscriptionPayload {
     public String nom;
     public String adresse;
     public String adresseBanque;
+    private String numeroCompteBanque;
+    private String agenceDomiciliation;
+
+    public String getAgenceDomiciliation() {
+        return agenceDomiciliation;
+    }
+
+    public void setAgenceDomiciliation(String agenceDomiciliation) {
+        this.agenceDomiciliation = agenceDomiciliation;
+    }
+
+    public String getNumeroCompteBanque() {
+        return numeroCompteBanque;
+    }
+
+    public void setNumeroCompteBanque(String numeroCompteBanque) {
+        this.numeroCompteBanque = numeroCompteBanque;
+    }
 
     public String getPrenom() {
         return prenom;
