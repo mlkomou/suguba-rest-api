@@ -16,6 +16,52 @@ public class Souscrition extends Generality {
     private String nomService;
     private String signaturePath;
 
+    private String civilite;
+    private String adresseBanque;
+    private String numeroCompteBanque;
+    private String identitePath;
+    private String agenceDomiciliation;
+
+    public String getCivilite() {
+        return civilite;
+    }
+
+    public void setCivilite(String civilite) {
+        this.civilite = civilite;
+    }
+
+    public String getAdresseBanque() {
+        return adresseBanque;
+    }
+
+    public void setAdresseBanque(String adresseBanque) {
+        this.adresseBanque = adresseBanque;
+    }
+
+    public String getNumeroCompteBanque() {
+        return numeroCompteBanque;
+    }
+
+    public void setNumeroCompteBanque(String numeroCompteBanque) {
+        this.numeroCompteBanque = numeroCompteBanque;
+    }
+
+    public String getIdentitePath() {
+        return identitePath;
+    }
+
+    public void setIdentitePath(String identitePath) {
+        this.identitePath = identitePath;
+    }
+
+    public String getAgenceDomiciliation() {
+        return agenceDomiciliation;
+    }
+
+    public void setAgenceDomiciliation(String agenceDomiciliation) {
+        this.agenceDomiciliation = agenceDomiciliation;
+    }
+
     public String getSignaturePath() {
         return signaturePath;
     }

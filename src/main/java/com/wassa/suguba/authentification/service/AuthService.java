@@ -238,6 +238,7 @@ public class AuthService {
                     demandeSouscription.setNomService(souscriptionPayload.getNomService());
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                    demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscriptionRepository.save(demandeSouscription);
@@ -255,6 +256,7 @@ public class AuthService {
                 souscrition.setCivilite(souscriptionPayload.getCivilite());
                 souscrition.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                 souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                souscrition.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                 souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                 souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                 demandeSouscriptionRepository.save(souscrition);
@@ -282,6 +284,7 @@ public class AuthService {
                     demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                    demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
@@ -294,6 +297,7 @@ public class AuthService {
                     demandeSouscription.setCivilite(souscriptionPayload.getCivilite());
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
+                    demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscription.setStatut("TRAITEMENT");
@@ -327,8 +331,13 @@ public class AuthService {
         }
     }
 
-    public Map<String, Object> createUser(AdminUserPayload adminUserPayload) {
+    public ResponseEntity<Map<String, Object>> createUser(AdminUserPayload adminUserPayload) {
         try {
+            Optional<ApplicationUser> oldUser = applicationUserRepository.findByUsername(adminUserPayload.getUsername());
+            if (oldUser.isPresent()) {
+                return new ResponseEntity<>(Response.error(adminUserPayload, "Cet utilisateur existe déjà"), HttpStatus.OK);
+            }
+
             if (adminUserPayload.getId() != null) {
                 Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(adminUserPayload.getId());
                 if (applicationUserOptional.isPresent()) {
@@ -342,7 +351,7 @@ public class AuthService {
                     client.setNom(adminUserPayload.getNom());
                     client.setEmail(adminUserPayload.getEmail());
                     clientRepository.save(client);
-                    return Response.success(applicationUserSaved, "Utilisateur modifié.");
+                    return new ResponseEntity<>(Response.success(applicationUserSaved, "Utilisateur modifié."), HttpStatus.OK);
                 }
             }
 
@@ -368,10 +377,10 @@ public class AuthService {
             UserConnected userConnected = new UserConnected();
             userConnected.setApplicationUser(userSaved);
             userConnected.setToken(getToken(applicationUserAuth));
-            return Response.success(userConnected, "Utilisateur inscrit");
+            return new ResponseEntity<>(Response.success(userConnected, "Utilisateur inscrit"), HttpStatus.OK);
         } catch (Exception e) {
             System.err.println(e);
-            return Response.error(e, "erreur d'inscription");
+            return new ResponseEntity<>(Response.error(e, "erreur d'inscription"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

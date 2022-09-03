@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    Map<String, Object> createUser(@RequestBody AdminUserPayload user) {
+    ResponseEntity<Map<String, Object>> createUser(@RequestBody AdminUserPayload user) {
         return authService.createUser(user);
     }
 

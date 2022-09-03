@@ -20,6 +20,8 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.wassa.suguba.app.constante.UploadPath.PIECE_DOWNLOAD_LINK;
+import static com.wassa.suguba.app.constante.UploadPath.SIGNATURE_DOWNLOAD_LINK;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.*;
 
 
@@ -57,7 +59,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         CREATE_USERU_URL,
                         SEND_SMS_URL,
                         SIGN_UP_SOUSCRIPTION_URL,
-                        DOWNLOAD_PDF_URL
+                        FILE_DOWNLOAD_URL
+
+
 //                        AEROPORT
                 ).permitAll()
                 .anyRequest().authenticated()
