@@ -333,51 +333,51 @@ public class AuthService {
 
     public ResponseEntity<Map<String, Object>> createUser(AdminUserPayload adminUserPayload) {
         try {
-            Optional<ApplicationUser> oldUser = applicationUserRepository.findByUsername(adminUserPayload.getUsername());
+            Optional<ApplicationUser> oldUser = applicationUserRepository.findByUsername(adminUserPayload.getEmail());
             if (oldUser.isPresent()) {
                 return new ResponseEntity<>(Response.error(adminUserPayload, "Cet utilisateur existe déjà"), HttpStatus.OK);
-            }
-
-            if (adminUserPayload.getId() != null) {
-                Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(adminUserPayload.getId());
-                if (applicationUserOptional.isPresent()) {
-                    ApplicationUser applicationUser = applicationUserOptional.get();
-                    applicationUser.setType(adminUserPayload.getTypeUser());
-                    applicationUser.setLastModifiedAt(LocalDateTime.now());
-                    ApplicationUser applicationUserSaved = applicationUserRepository.save(applicationUser);
-                    Client client = applicationUser.getClient();
-                    client.setPhone(adminUserPayload.getPhone());
-                    client.setPrenom(adminUserPayload.getPrenom());
-                    client.setNom(adminUserPayload.getNom());
-                    client.setEmail(adminUserPayload.getEmail());
-                    clientRepository.save(client);
-                    return new ResponseEntity<>(Response.success(applicationUserSaved, "Utilisateur modifié."), HttpStatus.OK);
+            } else {
+                if (adminUserPayload.getId() != null) {
+                    Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(adminUserPayload.getId());
+                    if (applicationUserOptional.isPresent()) {
+                        ApplicationUser applicationUser = applicationUserOptional.get();
+                        applicationUser.setType(adminUserPayload.getTypeUser());
+                        applicationUser.setLastModifiedAt(LocalDateTime.now());
+                        ApplicationUser applicationUserSaved = applicationUserRepository.save(applicationUser);
+                        Client client = applicationUser.getClient();
+                        client.setPhone(adminUserPayload.getPhone());
+                        client.setPrenom(adminUserPayload.getPrenom());
+                        client.setNom(adminUserPayload.getNom());
+                        client.setEmail(adminUserPayload.getEmail());
+                        clientRepository.save(client);
+                        return new ResponseEntity<>(Response.success(applicationUserSaved, "Utilisateur modifié."), HttpStatus.OK);
+                    }
                 }
+
+                Client client = new Client();
+                client.setPhone(adminUserPayload.getPhone());
+                client.setPrenom(adminUserPayload.getPrenom());
+                client.setNom(adminUserPayload.getNom());
+                client.setEmail(adminUserPayload.getEmail());
+                Client clientSaved = clientRepository.save(client);
+
+                ApplicationUser applicationUserAuth = new ApplicationUser();
+                applicationUserAuth.setUsername(adminUserPayload.getEmail());
+                applicationUserAuth.setPassword(adminUserPayload.getPassword());
+
+                ApplicationUser newUser = new ApplicationUser();
+                newUser.setClient(clientSaved);
+                newUser.setPassword(bCryptPasswordEncoder.encode(adminUserPayload.password));
+                newUser.setUsername(adminUserPayload.getEmail());
+                newUser.setType(adminUserPayload.getTypeUser());
+
+                ApplicationUser userSaved = applicationUserRepository.save(newUser);
+
+                UserConnected userConnected = new UserConnected();
+                userConnected.setApplicationUser(userSaved);
+                userConnected.setToken(getToken(applicationUserAuth));
+                return new ResponseEntity<>(Response.success(userConnected, "Utilisateur inscrit"), HttpStatus.OK);
             }
-
-            Client client = new Client();
-            client.setPhone(adminUserPayload.getPhone());
-            client.setPrenom(adminUserPayload.getPrenom());
-            client.setNom(adminUserPayload.getNom());
-            client.setEmail(adminUserPayload.getEmail());
-            Client clientSaved = clientRepository.save(client);
-
-            ApplicationUser applicationUserAuth = new ApplicationUser();
-            applicationUserAuth.setUsername(adminUserPayload.getEmail());
-            applicationUserAuth.setPassword(adminUserPayload.getPassword());
-
-            ApplicationUser newUser = new ApplicationUser();
-            newUser.setClient(clientSaved);
-            newUser.setPassword(bCryptPasswordEncoder.encode(adminUserPayload.password));
-            newUser.setUsername(adminUserPayload.getEmail());
-            newUser.setType(adminUserPayload.getTypeUser());
-
-            ApplicationUser userSaved = applicationUserRepository.save(newUser);
-
-            UserConnected userConnected = new UserConnected();
-            userConnected.setApplicationUser(userSaved);
-            userConnected.setToken(getToken(applicationUserAuth));
-            return new ResponseEntity<>(Response.success(userConnected, "Utilisateur inscrit"), HttpStatus.OK);
         } catch (Exception e) {
             System.err.println(e);
             return new ResponseEntity<>(Response.error(e, "erreur d'inscription"), HttpStatus.INTERNAL_SERVER_ERROR);
