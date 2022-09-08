@@ -192,7 +192,10 @@ public class AuthService {
         }
   }
 
-    public Map<String, Object> signupSouscription(SouscriptionAndPhoneNumbers souscriptionAndPhoneNumbers, MultipartFile identiteFile, MultipartFile signatureFile) {
+    public Map<String, Object> signupSouscription(SouscriptionAndPhoneNumbers souscriptionAndPhoneNumbers,
+                                                  MultipartFile identiteFile,
+                                                  MultipartFile signatureFile,
+                                                  MultipartFile identiteFileVerso) {
         try {
             SouscriptionPayload souscriptionPayload = souscriptionAndPhoneNumbers.getSouscriptionPayload();
             UserConnected userConnected = new UserConnected();
@@ -240,6 +243,7 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscriptionRepository.save(demandeSouscription);
 
@@ -258,6 +262,7 @@ public class AuthService {
                 souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                 souscrition.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                 souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                 souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                 demandeSouscriptionRepository.save(souscrition);
 
@@ -271,7 +276,10 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload, MultipartFile identiteFile, MultipartFile signatureFile) {
+    public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload,
+                                                                 MultipartFile identiteFile,
+                                                                 MultipartFile signatureFile,
+                                                                 MultipartFile identiteFileVerso) {
         try {
             Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
             if (user.isPresent()) {
@@ -286,6 +294,7 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
                     //enregistrement de la demande de souscription
@@ -299,6 +308,7 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscription.setStatut("TRAITEMENT");
                     demandeSouscription.setUser(user.get());

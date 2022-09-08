@@ -18,8 +18,17 @@ public class DemandeSouscription extends Generality{
     private String adresseBanque;
     private String numeroCompteBanque;
     private String identitePath;
+    private String identite2Path;
     private String signaturePath;
     private String agenceDomiciliation;
+
+    public String getIdentite2Path() {
+        return identite2Path;
+    }
+
+    public void setIdentite2Path(String identite2Path) {
+        this.identite2Path = identite2Path;
+    }
 
     public String getAgenceDomiciliation() {
         return agenceDomiciliation;

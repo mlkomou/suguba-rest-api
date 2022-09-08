@@ -54,11 +54,12 @@ public class UserController {
     Map<String, Object> signupSouscription(
                                            @RequestParam("souscriptionPayload") String souscriptionPayloadString,
                                            @RequestParam(value = "identiteFile", required = false) MultipartFile identiteFile,
-                                           @RequestParam(value = "signatureFile", required = false) MultipartFile signatureFile) throws JsonProcessingException {
+                                           @RequestParam(value = "signatureFile", required = false) MultipartFile signatureFile,
+                                           @RequestParam(value = "identiteFileVerso", required = false) MultipartFile identiteFileVerso) throws JsonProcessingException {
 
 //        @RequestBody SouscriptionAndPhoneNumbers souscriptionPayload,
         SouscriptionAndPhoneNumbers souscriptionPayload = new ObjectMapper().readValue(souscriptionPayloadString, SouscriptionAndPhoneNumbers.class);
-        return authService.signupSouscription(souscriptionPayload, identiteFile, signatureFile);
+        return authService.signupSouscription(souscriptionPayload, identiteFile, signatureFile, identiteFileVerso);
     }
 
     @GetMapping("/current-user/{userId}")
@@ -69,10 +70,11 @@ public class UserController {
     @PostMapping("/souscriptionInApp")
     ResponseEntity<Map<String, Object>> souscriptionInApp(@RequestParam("souscriptionPayload") String souscriptionPayloadString,
                                                           @RequestParam("identiteFile") MultipartFile identiteFile,
-                                                          @RequestParam("signatureFile") MultipartFile signatureFile) throws JsonProcessingException {
+                                                          @RequestParam("signatureFile") MultipartFile signatureFile,
+                                                          @RequestParam(value = "identiteFileVerso", required = false) MultipartFile identiteFileVerso) throws JsonProcessingException {
         SouscriptionPayload souscriptionPayload = new ObjectMapper().readValue(souscriptionPayloadString, SouscriptionPayload.class);
 
-        return authService.souscriptionInApp(souscriptionPayload, identiteFile, signatureFile);
+        return authService.souscriptionInApp(souscriptionPayload, identiteFile, signatureFile, identiteFileVerso);
     }
 
     @PostMapping("/page")

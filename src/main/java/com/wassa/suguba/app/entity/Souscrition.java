@@ -20,7 +20,25 @@ public class Souscrition extends Generality {
     private String adresseBanque;
     private String numeroCompteBanque;
     private String identitePath;
+    private String identite2Path;
+    private String rib;
     private String agenceDomiciliation;
+
+    public String getRib() {
+        return rib;
+    }
+
+    public void setRib(String rib) {
+        this.rib = rib;
+    }
+
+    public String getIdentite2Path() {
+        return identite2Path;
+    }
+
+    public void setIdentite2Path(String identite2Path) {
+        this.identite2Path = identite2Path;
+    }
 
     public String getCivilite() {
         return civilite;
