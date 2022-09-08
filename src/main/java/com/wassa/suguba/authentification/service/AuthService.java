@@ -242,6 +242,7 @@ public class AuthService {
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
+                    demandeSouscription.setRib(souscriptionPayload.getRib());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
@@ -261,6 +262,7 @@ public class AuthService {
                 souscrition.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                 souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                 souscrition.setAdresseBanque(souscriptionPayload.getAdresseBanque());
+                souscrition.setRib(souscriptionPayload.getRib());
                 souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                 souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                 souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
@@ -293,6 +295,7 @@ public class AuthService {
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
+                    demandeSouscription.setRib(souscriptionPayload.getRib());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
@@ -307,6 +310,7 @@ public class AuthService {
                     demandeSouscription.setNumeroCompteBanque(souscriptionPayload.getNumeroCompteBanque());
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
+                    demandeSouscription.setRib(souscriptionPayload.getRib());
                     demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));

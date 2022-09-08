@@ -20,7 +20,16 @@ public class DemandeSouscription extends Generality{
     private String identitePath;
     private String identite2Path;
     private String signaturePath;
+    private String rib;
     private String agenceDomiciliation;
+
+    public String getRib() {
+        return rib;
+    }
+
+    public void setRib(String rib) {
+        this.rib = rib;
+    }
 
     public String getIdentite2Path() {
         return identite2Path;
