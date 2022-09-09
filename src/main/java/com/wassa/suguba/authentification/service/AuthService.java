@@ -204,6 +204,7 @@ public class AuthService {
             client.setPrenom(souscriptionPayload.getPrenom());
             client.setNom(souscriptionPayload.getNom());
             client.setAdresse(souscriptionPayload.getAdresse());
+            client.setCivilite(souscriptionPayload.getCivilite());
             Client clientSaved = clientRepository.save(client);
 
             ApplicationUser user = new ApplicationUser();
@@ -248,6 +249,8 @@ public class AuthService {
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     demandeSouscriptionRepository.save(demandeSouscription);
 
+                    sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
                     return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
                 }
 
@@ -267,6 +270,8 @@ public class AuthService {
                 souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
                 souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                 demandeSouscriptionRepository.save(souscrition);
+                sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
 
                 return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
             } else {
@@ -284,7 +289,14 @@ public class AuthService {
                                                                  MultipartFile identiteFileVerso) {
         try {
             Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
+
             if (user.isPresent()) {
+
+                Client client = user.get().getClient();
+                client.setPrenom(souscriptionPayload.getPrenom());
+                client.setNom(souscriptionPayload.getNom());
+                client.setCivilite(souscriptionPayload.getCivilite());
+                clientRepository.save(client);
 //                Optional<Souscrition> souscritionOptional = souscritionRepository.findByUserId(souscriptionPayload.getUserId());
                 Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByUserIdAndStatut(user.get().getId(), "TRAITEMENT");
                 if (demandeSouscriptionOptional.isPresent()) {
@@ -301,6 +313,8 @@ public class AuthService {
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
                     //enregistrement de la demande de souscription
+                    sendSmsService.sendSmsSingle(client.getPhone(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 } else {
                     DemandeSouscription demandeSouscription = new DemandeSouscription();
@@ -317,6 +331,8 @@ public class AuthService {
                     demandeSouscription.setStatut("TRAITEMENT");
                     demandeSouscription.setUser(user.get());
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
+                    sendSmsService.sendSmsSingle(client.getPhone(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 }
 

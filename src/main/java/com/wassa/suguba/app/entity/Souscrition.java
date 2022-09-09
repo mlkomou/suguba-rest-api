@@ -16,7 +16,6 @@ public class Souscrition extends Generality {
     private String nomService;
     private String signaturePath;
 
-    private String civilite;
     private String adresseBanque;
     private String numeroCompteBanque;
     private String identitePath;
@@ -38,14 +37,6 @@ public class Souscrition extends Generality {
 
     public void setIdentite2Path(String identite2Path) {
         this.identite2Path = identite2Path;
-    }
-
-    public String getCivilite() {
-        return civilite;
-    }
-
-    public void setCivilite(String civilite) {
-        this.civilite = civilite;
     }
 
     public String getAdresseBanque() {

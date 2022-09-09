@@ -19,7 +19,7 @@ public class SendSmsService {
         return restTemplate.postForObject("https://ngsystem.net/sms/rest/smsService/sendSms", entity, SmsMessageResponse.class);
     }
 
-    void sendSmsSingle(String phone, String message) {
+    public void sendSmsSingle(String phone, String message) {
         SmsObject smsObject = new SmsObject();
         List<Smses> smses = new ArrayList<>();
         Smses smses1 = new Smses();

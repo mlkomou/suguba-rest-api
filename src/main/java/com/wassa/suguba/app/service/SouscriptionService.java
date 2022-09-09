@@ -28,13 +28,15 @@ public class SouscriptionService {
     private final ClientRepository clientRepository;
     private final ApplicationUserRepository applicationUserRepository;
     private final DemandeSouscriptionRepository demandeSouscriptionRepository;
+    private final SendSmsService sendSmsService;
 
-    public SouscriptionService(SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, ClientRepository clientRepository, ApplicationUserRepository applicationUserRepository, DemandeSouscriptionRepository demandeSouscriptionRepository) {
+    public SouscriptionService(SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, ClientRepository clientRepository, ApplicationUserRepository applicationUserRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendSmsService sendSmsService) {
         this.souscritionRepository = souscritionRepository;
         this.partenaireRepository = partenaireRepository;
         this.clientRepository = clientRepository;
         this.applicationUserRepository = applicationUserRepository;
         this.demandeSouscriptionRepository = demandeSouscriptionRepository;
+        this.sendSmsService = sendSmsService;
     }
 
    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut) {
@@ -68,9 +70,6 @@ public class SouscriptionService {
                     souscrition.setMontant(newMontant);
 
                     Client client = user.getClient();
-                    client.setPrenom(souscriptionClient.getPrenom());
-                    client.setNom(souscriptionClient.getNom());
-                    client.setEmail(souscriptionClient.getEmail());
 
                     if (souscriptionClient.getPartenaire() != null) {
                         Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
@@ -84,6 +83,7 @@ public class SouscriptionService {
 
                     clientRepository.save(client);
                     applicationUserRepository.save(user);
+                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
 
                     return Response.success(null, "Souscrition enregistrée.");
 
@@ -95,9 +95,6 @@ public class SouscriptionService {
                     souscrition.setMontant(souscriptionClient.getMontant());
 
                     Client client = user.getClient();
-                    client.setPrenom(souscriptionClient.getPrenom());
-                    client.setNom(souscriptionClient.getNom());
-                    client.setEmail(souscriptionClient.getEmail());
 
                     if (souscriptionClient.getPartenaire() != null) {
                         Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);

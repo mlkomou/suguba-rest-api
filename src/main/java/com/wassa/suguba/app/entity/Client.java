@@ -13,9 +13,18 @@ public class Client extends Generality{
     String namePath;
     String phonePath;
     String adresse;
+    private String civilite;
     private String entreprise;
     @ManyToOne
     private Partenaire partenaire;
+
+    public String getCivilite() {
+        return civilite;
+    }
+
+    public void setCivilite(String civilite) {
+        this.civilite = civilite;
+    }
 
     public String getAdresse() {
         return adresse;
