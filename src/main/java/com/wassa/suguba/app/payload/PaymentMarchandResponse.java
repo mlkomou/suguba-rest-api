@@ -11,6 +11,15 @@ public class PaymentMarchandResponse {
     public String status;
     public String numTransaction;
     public String payment_url;
+    public String codeMarchand;
+
+    public String getCodeMarchand() {
+        return codeMarchand;
+    }
+
+    public void setCodeMarchand(String codeMarchand) {
+        this.codeMarchand = codeMarchand;
+    }
 
     public String getPayment_url() {
         return payment_url;

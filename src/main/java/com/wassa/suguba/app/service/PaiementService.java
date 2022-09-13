@@ -51,7 +51,36 @@ public class PaiementService {
     }
 
     public Map<String, Object> getBalance() throws IOException {
-            URL url = new URL("https://api.gutouch.com/v1/MTCSU6019/get_balance");
+        URL url = new URL("https://api.gutouch.com/v1/MTCSU6019/get_balance");
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        httpConn.setRequestMethod("POST");
+
+        httpConn.setRequestProperty("Authorization", "Basic MjY5ZjU5YmVlMGNjNmY5NWI1N2ZiZjY1NDdiMjI0YTYwZmViMDY5Njc3NzU2Y2RmMTdiYTBiMWEwNGEzNDJmMTpmMTY1MzEyZGQ0MjMxOWIwZjk0OTMwY2U5MDM0YzRmNjJkMmYyMTY3OWIzOWRiMGJkZDhiYWUyYjJmNWZjN2Qx");
+        httpConn.setRequestProperty("Content-Type", "application/json");
+
+        httpConn.setDoOutput(true);
+        OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
+        writer.write("{\n\t\"partner_id\":\"MTC2607\",\n\t\"login_api\":\"79347878\",\n\t\"password_api\":\"vTFGt58vJL\"\n}");
+        writer.flush();
+        writer.close();
+        httpConn.getOutputStream().close();
+
+        InputStream responseStream = httpConn.getResponseCode() / 100 == 2
+                ? httpConn.getInputStream()
+                : httpConn.getErrorStream();
+        Scanner s = new Scanner(responseStream).useDelimiter("\\A");
+        String response = s.hasNext() ? s.next() : "";
+        System.out.println(response);
+        Gson g = new Gson();
+
+        BalanceResponse balanceResponse = g.fromJson(response, BalanceResponse.class);
+
+        return Response.success(balanceResponse, "Balance");
+    }
+
+    public Map<String, Object> orangeMoneyPay() {
+        try {
+            URL url = new URL("https://api.gutouch.com/dist/api/touchpayapi/v1/MTC2607/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setRequestMethod("POST");
 
@@ -60,7 +89,7 @@ public class PaiementService {
 
             httpConn.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
-            writer.write("{\n\t\"partner_id\":\"MTC2607\",\n\t\"login_api\":\"79347878\",\n\t\"password_api\":\"vTFGt58vJL\"\n}");
+            writer.write("{\n\t\"idFromClient\": \"4785411421145411645654654\",\n\t\"additionnalInfos\": {\n\t\t\"recipientEmail\": \"komou35@gmail.com\",\n\t\t\"recipientFirstName\": \"Lamine\",\n\t\t\"recipientLastName\": \"KOMOU\",\n\t\t\"destinataire\": \"70272328\"\n\t},\n\t\"amount\": 500,\n\t\"callback\": \"https://suguba.online\",\n\t\"recipientNumber\": \"70272328\",\n\t\"serviceCode\": \"ML_PAIEMENTMARCHAND_MOOV_TP\"\n}");
             writer.flush();
             writer.close();
             httpConn.getOutputStream().close();
@@ -71,40 +100,11 @@ public class PaiementService {
             Scanner s = new Scanner(responseStream).useDelimiter("\\A");
             String response = s.hasNext() ? s.next() : "";
             System.out.println(response);
-            Gson g = new Gson();
-
-            BalanceResponse balanceResponse = g.fromJson(response, BalanceResponse.class);
-
-            return Response.success(balanceResponse, "Balance");
+            return Response.success(response, "Orange pay");
+        } catch (Exception e) {
+            System.err.println(e);
+            return Response.error(e, "Erreur");
         }
-
-    public Map<String, Object> orangeMoneyPay() {
-       try {
-           URL url = new URL("https://api.gutouch.com/dist/api/touchpayapi/v1/MTC2607/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
-           HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-           httpConn.setRequestMethod("POST");
-
-           httpConn.setRequestProperty("Authorization", "Basic MjY5ZjU5YmVlMGNjNmY5NWI1N2ZiZjY1NDdiMjI0YTYwZmViMDY5Njc3NzU2Y2RmMTdiYTBiMWEwNGEzNDJmMTpmMTY1MzEyZGQ0MjMxOWIwZjk0OTMwY2U5MDM0YzRmNjJkMmYyMTY3OWIzOWRiMGJkZDhiYWUyYjJmNWZjN2Qx");
-           httpConn.setRequestProperty("Content-Type", "application/json");
-
-           httpConn.setDoOutput(true);
-           OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
-           writer.write("{\n\t\"idFromClient\": \"4785411421145411645654654\",\n\t\"additionnalInfos\": {\n\t\t\"recipientEmail\": \"komou35@gmail.com\",\n\t\t\"recipientFirstName\": \"Lamine\",\n\t\t\"recipientLastName\": \"KOMOU\",\n\t\t\"destinataire\": \"70272328\"\n\t},\n\t\"amount\": 500,\n\t\"callback\": \"https://suguba.online\",\n\t\"recipientNumber\": \"70272328\",\n\t\"serviceCode\": \"ML_PAIEMENTMARCHAND_MOOV_TP\"\n}");
-           writer.flush();
-           writer.close();
-           httpConn.getOutputStream().close();
-
-           InputStream responseStream = httpConn.getResponseCode() / 100 == 2
-                   ? httpConn.getInputStream()
-                   : httpConn.getErrorStream();
-           Scanner s = new Scanner(responseStream).useDelimiter("\\A");
-           String response = s.hasNext() ? s.next() : "";
-           System.out.println(response);
-           return Response.success(response, "Orange pay");
-       } catch (Exception e) {
-           System.err.println(e);
-           return Response.error(e, "Erreur");
-       }
     }
 
 
@@ -117,7 +117,7 @@ public class PaiementService {
         return provider;
     }
 
-   public void makePayementMarchand(PaymentMarchandPayload payementPayload, Commande commande) {
+    public void makePayementMarchand(PaymentMarchandPayload payementPayload, Commande commande) {
         try {
             AdditionalInfosPayload additionalInfosPayload = new AdditionalInfosPayload();
             ApplicationUser user = commande.getUser();
@@ -131,8 +131,7 @@ public class PaiementService {
 
 
             ///// Digest auth
-            HttpClient httpClient = HttpClientBuilder.create().
-                    setDefaultCredentialsProvider(provider()).useSystemProperties().build();
+            HttpClient httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider()).useSystemProperties().build();
 //            HttpPut httpPost = new HttpPut("https://api.gutouch.com/dist/api/touchpayapi/v1/MTC2607/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
             HttpPut httpPost = new HttpPut("https://api.gutouch.com/dist/api/touchpayapi/v1/MTCSU6019/transaction?loginAgent=79347878&passwordAgent=vTFGt58vJL");
             httpPost.setHeader("Content-type", "application/json");
@@ -168,6 +167,8 @@ public class PaiementService {
 
                 payementMarchandRepository.save(payementMarchandToSave);
                 sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande est en cours de traitement, nous vous enverrons un message de confirmation. SUGUBA vous remercie.");
+            } else {
+                System.err.println("Erreur API Payment: " + paymentMarchandResponse.toString());
             }
         } catch (Exception e) {
             System.err.println(e);
@@ -175,34 +176,34 @@ public class PaiementService {
     }
 
     public void payementNotification(PayementMarchandNotificationPayload payementMarchandNotificationPayload) {
-            try {
-                Commande commandeToUpdate = null;
-                Optional<PayementMarchand> payementMarchandOptional = payementMarchandRepository.findByIdFromClient(payementMarchandNotificationPayload.getPartner_transaction_id());
-                PayementMarchandNotification payementMarchandNotification = new PayementMarchandNotification();
-                payementMarchandNotification.setService_id(payementMarchandNotificationPayload.getService_id());
-                payementMarchandNotification.setCall_back_url(payementMarchandNotificationPayload.getCall_back_url());
-                payementMarchandNotification.setGu_transaction_id(payementMarchandNotificationPayload.getGu_transaction_id());
-                payementMarchandNotification.setPartner_transaction_id(payementMarchandNotificationPayload.getPartner_transaction_id());
-                payementMarchandNotification.setStatus(payementMarchandNotificationPayload.getStatus());
+        try {
+            Commande commandeToUpdate = null;
+            Optional<PayementMarchand> payementMarchandOptional = payementMarchandRepository.findByIdFromClient(payementMarchandNotificationPayload.getPartner_transaction_id());
+            PayementMarchandNotification payementMarchandNotification = new PayementMarchandNotification();
+            payementMarchandNotification.setService_id(payementMarchandNotificationPayload.getService_id());
+            payementMarchandNotification.setCall_back_url(payementMarchandNotificationPayload.getCall_back_url());
+            payementMarchandNotification.setGu_transaction_id(payementMarchandNotificationPayload.getGu_transaction_id());
+            payementMarchandNotification.setPartner_transaction_id(payementMarchandNotificationPayload.getPartner_transaction_id());
+            payementMarchandNotification.setStatus(payementMarchandNotificationPayload.getStatus());
 
-                if (payementMarchandOptional.isPresent()) {
-                    PayementMarchand payementMarchand = payementMarchandOptional.get();
-                    Commande commande = payementMarchand.getCommande();
-                    commandeToUpdate = payementMarchand.getCommande();
-                    Paiement paiement = commande.getPaiement();
-                    paiement.setStatus(payementMarchandNotificationPayload.getStatus());
-                    paiementRepository.save(paiement);
+            if (payementMarchandOptional.isPresent()) {
+                PayementMarchand payementMarchand = payementMarchandOptional.get();
+                Commande commande = payementMarchand.getCommande();
+                commandeToUpdate = payementMarchand.getCommande();
+                Paiement paiement = commande.getPaiement();
+                paiement.setStatus(payementMarchandNotificationPayload.getStatus());
+                paiementRepository.save(paiement);
 
-                    if (Objects.equals(payementMarchandNotificationPayload.getStatus(), "SUCCESSFUL")) {
-                        sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande est effectué avec succès, nous vous contacterons pour la livraison. SUGUBA vous remercie.");
-                    } else {
-                        sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande a échoué, vous devez vérifier si le solde votre compte est suffisant. SUGUBA vous remercie.");
-                    }
+                if (Objects.equals(payementMarchandNotificationPayload.getStatus(), "SUCCESSFUL")) {
+                    sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande est effectué avec succès, nous vous contacterons pour la livraison. SUGUBA vous remercie.");
+                } else {
+                    sendSmsService.sendSmsSingle(commande.getUser().getUsername(), "Le payement de votre commande a échoué, vous devez vérifier si le solde votre compte est suffisant. SUGUBA vous remercie.");
                 }
-                payementMarchandNotification.setCommande(commandeToUpdate);
-                payementMarchandNotificationRepository.save(payementMarchandNotification);
-            } catch (Exception ignored) {
-
             }
+            payementMarchandNotification.setCommande(commandeToUpdate);
+            payementMarchandNotificationRepository.save(payementMarchandNotification);
+        } catch (Exception ignored) {
+
+        }
     }
 }

@@ -39,7 +39,7 @@ public class SouscriptionService {
         this.sendSmsService = sendSmsService;
     }
 
-   public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut) {
+    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut) {
         try {
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
             Pageable paging = PageRequest.of(page, size, defaultSort);
@@ -108,6 +108,9 @@ public class SouscriptionService {
 
                     clientRepository.save(client);
                     applicationUserRepository.save(user);
+
+                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
+
 
                     return Response.success(null, "Souscrition enregistrée.");
                 }

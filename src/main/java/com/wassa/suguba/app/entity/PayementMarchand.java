@@ -19,6 +19,10 @@ public class PayementMarchand extends Generality {
     @ManyToOne
     public Commande commande;
 
+
+
+
+
     public Commande getCommande() {
         return commande;
     }
