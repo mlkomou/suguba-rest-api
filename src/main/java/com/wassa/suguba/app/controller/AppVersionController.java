@@ -1,11 +1,7 @@
 package com.wassa.suguba.app.controller;
 
-import com.wassa.suguba.app.entity.AppVersion;
 import com.wassa.suguba.app.service.AppVersionService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,7 +15,7 @@ public class AppVersionController {
     }
 
     @GetMapping
-    public Map<String, Object> getAppVersion(@RequestBody AppVersion appVersion) {
-        return appVersionService.getAppVersion(appVersion);
+    public Map<String, Object> getAppVersion() {
+        return appVersionService.getAppVersion();
     }
 }

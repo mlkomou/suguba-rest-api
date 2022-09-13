@@ -11,6 +11,24 @@ import javax.persistence.Table;
 public class AppVersion extends Generality {
     private String version;
     private String build;
+    private String name;
+    private String versionId;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getVersionId() {
+        return versionId;
+    }
+
+    public void setVersionId(String versionId) {
+        this.versionId = versionId;
+    }
 
     public String getBuild() {
         return build;

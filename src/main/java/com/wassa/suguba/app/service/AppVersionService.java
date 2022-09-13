@@ -5,6 +5,7 @@ import com.wassa.suguba.app.repository.AppVersionRepository;
 import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,10 +17,14 @@ public class AppVersionService {
         this.appVersionRepository = appVersionRepository;
     }
 
-    public Map<String, Object> getAppVersion(AppVersion appVersion) {
+    public Map<String, Object> getAppVersion() {
         try {
-            Optional<AppVersion> appVersionOptional = appVersionRepository.findByVersion(appVersion.getVersion());
-            return appVersionOptional.map(version -> Response.success(version, "App version")).orElseGet(() -> Response.error(new AppVersion(), "Cette version n'existe pas"));
+            List<AppVersion> appVersions = appVersionRepository.findAll();
+            if (!appVersions.isEmpty()) {
+                return Response.success(appVersions.get(0), "Version actuelle");
+            } else {
+                return Response.error(null, "Il n'y a pas de version disponible");
+            }
         } catch (Exception e) {
             return Response.error(e, "Erreur de récupération de la version");
         }
