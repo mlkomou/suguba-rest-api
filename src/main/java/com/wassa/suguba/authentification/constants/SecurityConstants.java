@@ -14,6 +14,8 @@ public class SecurityConstants {
     public static final String PAIEMENT_URL = "/paiements/payement_callback";
     public static final String FILE_DOWNLOAD_URL = "/files/**";
     public static final String APP_VERSION_URL = "/app-versions/**";
+    public static final String PHARMACIE_VERSION_URL = "/pharmacies/download/**";
+    public static final String PAIEMENT_FACTURE_VERSION_URL = "/paiement_factures/download/**";
 //    public static final String DOWNLOAD_PRODUIT = "/produits/**";
 //    public static final String DOWNLOAD_CATEGORIE = "/categories/**";
 //    public static final String DOWNLOAD_COMMANDE = "/commandes/**";
