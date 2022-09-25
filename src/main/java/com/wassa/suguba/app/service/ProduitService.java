@@ -79,7 +79,7 @@ public class ProduitService {
         try {
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
             Pageable paging = PageRequest.of(page, size, defaultSort);
-            Page<Produit> produits = produitRepository.findAll(paging);
+            Page<Produit> produits = produitRepository.findAllByActive(true, paging);
             return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
@@ -98,7 +98,7 @@ public class ProduitService {
     public Map<String, Object> getProduitsByCategorie(Long catId, int page, int size) {
         try {
             Pageable paging = PageRequest.of(page, size);
-            Page<Produit> produits = produitRepository.findAllByCategorieId(catId, paging);
+            Page<Produit> produits = produitRepository.findAllByCategorieIdAndActive(catId, true, paging);
             return Response.success(produits, "Liste des produits.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");

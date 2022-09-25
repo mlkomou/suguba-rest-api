@@ -7,6 +7,7 @@ import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,7 @@ public class PubliciteService {
     }
     public Map<String, Object> savePublicite(Publicite publicite, MultipartFile photo) {
         try {
-            publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK));
             Publicite publiciteSaced = publiciteRepository.save(publicite);
             return Response.success(publiciteSaced, "Publicite enregistrée.");
         } catch (Exception e) {
@@ -38,7 +39,7 @@ public class PubliciteService {
         try {
             Optional<Publicite> publiciteOptional = publiciteRepository.findById(publicite.getId());
             if (publiciteOptional.isPresent()) {
-                publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK));
                 Publicite publiciteSaced = publiciteRepository.save(publicite);
                 return Response.success(publiciteSaced, "Publicite modifiée.");
             }
@@ -63,8 +64,9 @@ public class PubliciteService {
 
     public Map<String, Object> getPublicitesByPage(int page, int size) {
         try {
-            Pageable paging = PageRequest.of(page, size);
-            Page<Publicite> publicites = publiciteRepository.findAll(paging);
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
+            Page<Publicite> publicites = publiciteRepository.findAllByActive(true, paging);
             return Response.success(publicites, "Liste des publicites.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");

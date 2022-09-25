@@ -50,6 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         APP_VERSION_URL,
                         PHARMACIE_VERSION_URL,
                         PAIEMENT_FACTURE_VERSION_URL,
+                        PUB_URL,
 //                        DOWNLOAD_CATEGORIE,
 //                        DOWNLOAD_COMMANDE,
 //                        DOWNLOAD_PHARMACIE,

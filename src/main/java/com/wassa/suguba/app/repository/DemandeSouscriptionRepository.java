@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface DemandeSouscriptionRepository extends JpaRepository<DemandeSouscription, Long> {
     Optional<DemandeSouscription> findByUserIdAndStatut(Long userId, String status);
     Optional<DemandeSouscription> findByIdAndStatut(Long id, String status);
-    Page<DemandeSouscription> findAllByStatutAndActive(String statut, boolean active, Pageable pageable);
+    Page<DemandeSouscription> findAllByStatutAndStatutBanqueAndActive(String statut, String statutBanque, boolean active, Pageable pageable);
 }

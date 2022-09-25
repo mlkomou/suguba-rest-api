@@ -20,13 +20,19 @@ public class SouscriptionController {
         return souscriptionService.compleAcount(souscriptionClient);
     }
 
+    @PostMapping("/complete_banque")
+    Map<String, Object> compleSousciptionBanque(@RequestBody SouscriptionClient souscriptionClient) {
+        return souscriptionService.compleAcountForBanque(souscriptionClient);
+    }
+
     @PostMapping("/get_by_active")
     Map<String , Object> getSouscritionByActive(@RequestParam("page") int page,
                                                 @RequestParam("size") int size,
                                                 @RequestParam("active") boolean active,
-                                                @RequestParam("statut") String statut) {
+                                                @RequestParam("statut") String statut,
+                                                @RequestParam("statutBanque") String statutBanque) {
         System.err.println("statut " + statut);
-        return souscriptionService.getSouscritonByStatut(page, size, active, statut);
+        return souscriptionService.getSouscritonByStatut(page, size, active, statut, statutBanque);
     }
 
     @GetMapping("/active/{id}/{statut}")

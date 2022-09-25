@@ -13,6 +13,7 @@ public class DemandeSouscription extends Generality{
     @ManyToOne
     private ApplicationUser user;
     private String statut;
+    private String statutBanque = "TRAITEMENT";
     private String nomService;
     private String civilite;
     private String adresseBanque;
@@ -22,6 +23,14 @@ public class DemandeSouscription extends Generality{
     private String signaturePath;
     private String rib;
     private String agenceDomiciliation;
+
+    public String getStatutBanque() {
+        return statutBanque;
+    }
+
+    public void setStatutBanque(String statutBanque) {
+        this.statutBanque = statutBanque;
+    }
 
     public String getRib() {
         return rib;

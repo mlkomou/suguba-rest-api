@@ -39,18 +39,101 @@ public class SouscriptionService {
         this.sendSmsService = sendSmsService;
     }
 
-    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut) {
+    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut, String statutBanque) {
         try {
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
             Pageable paging = PageRequest.of(page, size, defaultSort);
-            Page<DemandeSouscription> souscritions = demandeSouscriptionRepository.findAllByStatutAndActive(statut, active, paging);
+            Page<DemandeSouscription> souscritions = demandeSouscriptionRepository.findAllByStatutAndStatutBanqueAndActive(statut, statutBanque, active, paging);
             return Response.success(souscritions, "Liste des comptes");
         } catch (Exception e) {
             return Response.error(e, "Erreur de récupération");
         }
     }
 
+
+    //suguba validation
     public Map<String, Object> compleAcount(SouscriptionClient souscriptionClient) {
+        try {
+            Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByIdAndStatut(souscriptionClient.getId(), "TRAITEMENT");
+
+            if (demandeSouscriptionOptional.isPresent()) {
+                // demande de souscription existe
+                DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
+                demandeSouscription.setStatut("VALIDE");
+                demandeSouscriptionRepository.save(demandeSouscription);
+                return Response.success(null, "Demande de Souscription validée au niveau de SUGUBA, elle sera soumise à la banque pour une dexième validation.");
+
+//                Souscrition souscrition = souscritionOptional.get();
+//                ApplicationUser user = demandeSouscription.getUser();
+//                Optional<Souscrition> souscritionOptional = souscritionRepository.findByUserId(user.getId());
+//                if (souscritionOptional.isPresent()) {
+//                    // souscription existe, faire le cumul des montant
+//
+//                    Souscrition souscrition = souscritionOptional.get();
+//                    System.err.println("existe: " + souscrition.getMontant());
+//                    souscrition.setUser(user);
+//                    Double newMontant = souscriptionClient.getMontant() + souscrition.getMontant();
+//                    souscrition.setMontant(newMontant);
+//
+//                    Client client = user.getClient();
+//
+//                    if (souscriptionClient.getPartenaire() != null) {
+//                        Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
+//                        souscrition.setPartenaire(partenaire.get());
+//                        client.setPartenaire(partenaire.get());
+//                        user.setServicePaiement(partenaire.get());
+//                    }
+//                    souscritionRepository.save(souscrition);
+//                    demandeSouscription.setStatut("VALIDE");
+//                    demandeSouscriptionRepository.save(demandeSouscription);
+//
+//                    clientRepository.save(client);
+//                    applicationUserRepository.save(user);
+//                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
+//
+//                    return Response.success(null, "Souscrition enregistrée.");
+//
+//                } else {
+//                    Souscrition souscrition = new Souscrition();
+//                    // souscription existe, faire le cumul des montant
+//
+//                    souscrition.setUser(user);
+//                    souscrition.setMontant(souscriptionClient.getMontant());
+//
+//                    Client client = user.getClient();
+//
+//                    if (souscriptionClient.getPartenaire() != null) {
+//                        Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
+//                        souscrition.setPartenaire(partenaire.get());
+//                        client.setPartenaire(partenaire.get());
+//                        user.setServicePaiement(partenaire.get());
+//                    }
+//                    souscritionRepository.save(souscrition);
+//                    demandeSouscription.setStatut("VALIDE");
+//                    demandeSouscriptionRepository.save(demandeSouscription);
+//
+//                    clientRepository.save(client);
+//                    applicationUserRepository.save(user);
+//
+//                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
+//
+//
+//                    return Response.success(null, "Souscrition enregistrée.");
+//                }
+
+
+            } else {
+                return Response.error(new Object(), "Cette demande de souscription n'existe pas.");
+            }
+
+        } catch (Exception e) {
+            System.err.println(e);
+            return Response.error(e, "Erreur d'enregistrement. Veuillez réessayer plus tard.");
+        }
+    }
+
+    //banque validation
+    public Map<String, Object> compleAcountForBanque(SouscriptionClient souscriptionClient) {
         try {
             Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByIdAndStatut(souscriptionClient.getId(), "TRAITEMENT");
 
@@ -69,23 +152,7 @@ public class SouscriptionService {
                     Double newMontant = souscriptionClient.getMontant() + souscrition.getMontant();
                     souscrition.setMontant(newMontant);
 
-                    Client client = user.getClient();
-
-                    if (souscriptionClient.getPartenaire() != null) {
-                        Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
-                        souscrition.setPartenaire(partenaire.get());
-                        client.setPartenaire(partenaire.get());
-                        user.setServicePaiement(partenaire.get());
-                    }
-                    souscritionRepository.save(souscrition);
-                    demandeSouscription.setStatut("VALIDE");
-                    demandeSouscriptionRepository.save(demandeSouscription);
-
-                    clientRepository.save(client);
-                    applicationUserRepository.save(user);
-                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
-
-                    return Response.success(null, "Souscrition enregistrée.");
+                    return getClient(souscriptionClient, demandeSouscription, user, souscrition);
 
                 } else {
                     Souscrition souscrition = new Souscrition();
@@ -94,25 +161,7 @@ public class SouscriptionService {
                     souscrition.setUser(user);
                     souscrition.setMontant(souscriptionClient.getMontant());
 
-                    Client client = user.getClient();
-
-                    if (souscriptionClient.getPartenaire() != null) {
-                        Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
-                        souscrition.setPartenaire(partenaire.get());
-                        client.setPartenaire(partenaire.get());
-                        user.setServicePaiement(partenaire.get());
-                    }
-                    souscritionRepository.save(souscrition);
-                    demandeSouscription.setStatut("VALIDE");
-                    demandeSouscriptionRepository.save(demandeSouscription);
-
-                    clientRepository.save(client);
-                    applicationUserRepository.save(user);
-
-                    sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
-
-
-                    return Response.success(null, "Souscrition enregistrée.");
+                    return getClient(souscriptionClient, demandeSouscription, user, souscrition);
                 }
 
 
@@ -124,6 +173,27 @@ public class SouscriptionService {
             System.err.println(e);
             return Response.error(e, "Erreur d'enregistrement. Veuillez réessayer plus tard.");
         }
+    }
+
+    private Map<String, Object> getClient(SouscriptionClient souscriptionClient, DemandeSouscription demandeSouscription, ApplicationUser user, Souscrition souscrition) {
+        Client client = user.getClient();
+
+        if (souscriptionClient.getPartenaire() != null) {
+            Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.partenaire);
+            souscrition.setPartenaire(partenaire.get());
+            client.setPartenaire(partenaire.get());
+            user.setServicePaiement(partenaire.get());
+        }
+        souscritionRepository.save(souscrition);
+        demandeSouscription.setStatutBanque("VALIDE");
+        demandeSouscriptionRepository.save(demandeSouscription);
+
+        clientRepository.save(client);
+        applicationUserRepository.save(user);
+
+        sendSmsService.sendSmsSingle(client.getPhone(), "Salut " + client.getPrenom() + ", Votre souscription a été validée avec succès, vous pouvez désormais passer des commandes à crédit. "+"\n"+"  SUGUBA vous remercie.");
+
+        return Response.success(null, "Souscrition enregistrée.");
     }
 
     public Map<String, Object> activeAndDesactiveSouscr(Long id, boolean statut) {

@@ -7,6 +7,7 @@ import com.wassa.suguba.authentification.entity.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,8 +65,9 @@ public class CategorieService {
 
     public Map<String, Object> getCategoriesByPage(int page, int size) {
         try {
-            Pageable paging = PageRequest.of(page, size);
-            Page<Categorie> categories = categorieRepository.findAll(paging);
+            Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
+            Pageable paging = PageRequest.of(page, size, defaultSort);
+            Page<Categorie> categories = categorieRepository.findAllByActive(true, paging);
             return Response.success(categories, "Liste des categories.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
@@ -74,7 +76,7 @@ public class CategorieService {
 
     public Map<String, Object> getCategories() {
         try {
-            List<Categorie> categories = categorieRepository.findAll();
+            List<Categorie> categories = categorieRepository.findAllByActive(true);
             return Response.success(categories, "Liste des categories.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");

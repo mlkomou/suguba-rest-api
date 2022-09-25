@@ -6,24 +6,15 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "publicite")
 public class Publicite extends Generality {
-    private String titre;
-    private String description;
+    private String name;
     private String path;
 
-    public String getTitre() {
-        return titre;
+    public String getName() {
+        return name;
     }
 
-    public void setTitre(String titre) {
-        this.titre = titre;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPath() {

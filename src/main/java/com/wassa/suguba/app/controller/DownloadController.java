@@ -25,6 +25,9 @@ public class DownloadController {
             case "signature":
                 path = UploadPath.SIGNATURE_DOWNLOAD_LINK;
                 break;
+            case "pub":
+                path = UploadPath.PUBLICITE_DOWNLOAD_LINK;
+                break;
         }
         try {
             Path fileName = Paths.get(path, file);

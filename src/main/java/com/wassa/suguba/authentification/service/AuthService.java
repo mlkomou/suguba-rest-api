@@ -445,7 +445,8 @@ public class AuthService {
                     }
                 }
 
-                phoneVerificationRepository.save(phoneVerification);
+                phoneVerification.setVerificationCode(codeConf);
+//                phoneVerificationRepository.save(phoneVerification);
                 SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
 
                 phoneVerificationRepository.save(phoneVerification);
