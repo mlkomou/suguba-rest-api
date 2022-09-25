@@ -11,4 +11,5 @@ public interface DemandeSouscriptionRepository extends JpaRepository<DemandeSous
     Optional<DemandeSouscription> findByUserIdAndStatut(Long userId, String status);
     Optional<DemandeSouscription> findByIdAndStatut(Long id, String status);
     Page<DemandeSouscription> findAllByStatutAndStatutBanqueAndActive(String statut, String statutBanque, boolean active, Pageable pageable);
+    Page<DemandeSouscription> findAllByStatutAndStatutBanqueAndPartenaireIdAndActive(String statut, String statutBanque, Long partenaireId, boolean active, Pageable pageable);
 }

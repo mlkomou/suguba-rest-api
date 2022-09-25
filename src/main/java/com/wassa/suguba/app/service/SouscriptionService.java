@@ -1,14 +1,8 @@
 package com.wassa.suguba.app.service;
 
-import com.wassa.suguba.app.entity.Client;
-import com.wassa.suguba.app.entity.DemandeSouscription;
-import com.wassa.suguba.app.entity.Partenaire;
-import com.wassa.suguba.app.entity.Souscrition;
+import com.wassa.suguba.app.entity.*;
 import com.wassa.suguba.app.payload.SouscriptionClient;
-import com.wassa.suguba.app.repository.ClientRepository;
-import com.wassa.suguba.app.repository.DemandeSouscriptionRepository;
-import com.wassa.suguba.app.repository.PartenaireRepository;
-import com.wassa.suguba.app.repository.SouscritionRepository;
+import com.wassa.suguba.app.repository.*;
 import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
 import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
@@ -39,12 +33,17 @@ public class SouscriptionService {
         this.sendSmsService = sendSmsService;
     }
 
-    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut, String statutBanque) {
+    public Map<String, Object> getSouscritonByStatut(int page, int size, Boolean active, String statut, String statutBanque, Long partenaireId) {
         try {
             Sort defaultSort = Sort.by(Sort.Direction.DESC, "createdAt");
             Pageable paging = PageRequest.of(page, size, defaultSort);
-            Page<DemandeSouscription> souscritions = demandeSouscriptionRepository.findAllByStatutAndStatutBanqueAndActive(statut, statutBanque, active, paging);
-            return Response.success(souscritions, "Liste des comptes");
+            if (partenaireId == null) {
+                Page<DemandeSouscription> souscritions = demandeSouscriptionRepository.findAllByStatutAndStatutBanqueAndActive(statut, statutBanque, active, paging);
+                return Response.success(souscritions, "Liste des comptes");
+            } else {
+                Page<DemandeSouscription> souscritions = demandeSouscriptionRepository.findAllByStatutAndStatutBanqueAndPartenaireIdAndActive(statut, statutBanque, partenaireId, active, paging);
+                return Response.success(souscritions, "Liste des comptes");
+            }
         } catch (Exception e) {
             return Response.error(e, "Erreur de récupération");
         }
@@ -57,9 +56,11 @@ public class SouscriptionService {
             Optional<DemandeSouscription> demandeSouscriptionOptional = demandeSouscriptionRepository.findByIdAndStatut(souscriptionClient.getId(), "TRAITEMENT");
 
             if (demandeSouscriptionOptional.isPresent()) {
+                Optional<Partenaire> partenaire = partenaireRepository.findById(souscriptionClient.getPartenaire());
                 // demande de souscription existe
                 DemandeSouscription demandeSouscription = demandeSouscriptionOptional.get();
                 demandeSouscription.setStatut("VALIDE");
+                demandeSouscription.setPartenaire(partenaire.get());
                 demandeSouscriptionRepository.save(demandeSouscription);
                 return Response.success(null, "Demande de Souscription validée au niveau de SUGUBA, elle sera soumise à la banque pour une dexième validation.");
 

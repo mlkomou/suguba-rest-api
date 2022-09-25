@@ -23,6 +23,16 @@ public class DemandeSouscription extends Generality{
     private String signaturePath;
     private String rib;
     private String agenceDomiciliation;
+    @ManyToOne
+    private Partenaire partenaire;
+
+    public Partenaire getPartenaire() {
+        return partenaire;
+    }
+
+    public void setPartenaire(Partenaire partenaire) {
+        this.partenaire = partenaire;
+    }
 
     public String getStatutBanque() {
         return statutBanque;

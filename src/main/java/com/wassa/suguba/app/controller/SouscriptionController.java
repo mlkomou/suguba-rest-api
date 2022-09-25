@@ -30,9 +30,9 @@ public class SouscriptionController {
                                                 @RequestParam("size") int size,
                                                 @RequestParam("active") boolean active,
                                                 @RequestParam("statut") String statut,
-                                                @RequestParam("statutBanque") String statutBanque) {
-        System.err.println("statut " + statut);
-        return souscriptionService.getSouscritonByStatut(page, size, active, statut, statutBanque);
+                                                @RequestParam("statutBanque") String statutBanque,
+                                                @RequestParam(value = "partenaireId", required = false) Long  partenaireId) {
+        return souscriptionService.getSouscritonByStatut(page, size, active, statut, statutBanque, partenaireId);
     }
 
     @GetMapping("/active/{id}/{statut}")
