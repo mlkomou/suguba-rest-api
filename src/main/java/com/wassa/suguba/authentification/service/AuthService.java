@@ -363,6 +363,7 @@ public class AuthService {
 
     public ResponseEntity<Map<String, Object>> createUser(AdminUserPayload adminUserPayload) {
         try {
+            System.err.println(adminUserPayload.toString());
             Optional<ApplicationUser> oldUser = applicationUserRepository.findByUsername(adminUserPayload.getEmail());
             if (oldUser.isPresent()) {
                 return new ResponseEntity<>(Response.error(adminUserPayload, "Cet utilisateur existe déjà"), HttpStatus.OK);
@@ -371,6 +372,10 @@ public class AuthService {
                     Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(adminUserPayload.getId());
                     if (applicationUserOptional.isPresent()) {
                         ApplicationUser applicationUser = applicationUserOptional.get();
+                        if (adminUserPayload.getPartenaire() != null) {
+                            Optional<Partenaire> partenaire = partenaireRepository.findById(adminUserPayload.getPartenaire());
+                            partenaire.ifPresent(applicationUser::setPartenaire);
+                        }
                         applicationUser.setType(adminUserPayload.getTypeUser());
                         applicationUser.setLastModifiedAt(LocalDateTime.now());
                         ApplicationUser applicationUserSaved = applicationUserRepository.save(applicationUser);
@@ -401,6 +406,11 @@ public class AuthService {
                 newUser.setUsername(adminUserPayload.getEmail());
                 newUser.setType(adminUserPayload.getTypeUser());
 
+                if (adminUserPayload.getPartenaire() != null) {
+                    Optional<Partenaire> partenaire = partenaireRepository.findById(adminUserPayload.getPartenaire());
+                    partenaire.ifPresent(newUser::setPartenaire);
+                }
+//                newUser.setPartenaire(adminUserPayload.getPartenaire());
                 ApplicationUser userSaved = applicationUserRepository.save(newUser);
 
                 UserConnected userConnected = new UserConnected();

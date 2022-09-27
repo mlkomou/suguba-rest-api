@@ -26,6 +26,26 @@ public class DemandeSouscription extends Generality{
     @ManyToOne
     private Partenaire partenaire;
 
+    @Override
+    public String toString() {
+        return "DemandeSouscription{" +
+                "montant=" + montant +
+                ", user=" + user +
+                ", statut='" + statut + '\'' +
+                ", statutBanque='" + statutBanque + '\'' +
+                ", nomService='" + nomService + '\'' +
+                ", civilite='" + civilite + '\'' +
+                ", adresseBanque='" + adresseBanque + '\'' +
+                ", numeroCompteBanque='" + numeroCompteBanque + '\'' +
+                ", identitePath='" + identitePath + '\'' +
+                ", identite2Path='" + identite2Path + '\'' +
+                ", signaturePath='" + signaturePath + '\'' +
+                ", rib='" + rib + '\'' +
+                ", agenceDomiciliation='" + agenceDomiciliation + '\'' +
+                ", partenaire=" + partenaire +
+                '}';
+    }
+
     public Partenaire getPartenaire() {
         return partenaire;
     }

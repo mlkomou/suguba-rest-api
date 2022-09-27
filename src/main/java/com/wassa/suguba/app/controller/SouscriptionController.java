@@ -1,6 +1,7 @@
 package com.wassa.suguba.app.controller;
 
 import com.wassa.suguba.app.payload.SouscriptionClient;
+import com.wassa.suguba.app.payload.ValidationSouscrBanque;
 import com.wassa.suguba.app.service.SouscriptionService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +22,8 @@ public class SouscriptionController {
     }
 
     @PostMapping("/complete_banque")
-    Map<String, Object> compleSousciptionBanque(@RequestBody SouscriptionClient souscriptionClient) {
-        return souscriptionService.compleAcountForBanque(souscriptionClient);
+    Map<String, Object> compleSousciptionBanque(@RequestBody ValidationSouscrBanque validationSouscrBanque) {
+        return souscriptionService.compleAcountForBanque(validationSouscrBanque);
     }
 
     @PostMapping("/get_by_active")

@@ -1,5 +1,7 @@
 package com.wassa.suguba.app.payload;
 
+import com.wassa.suguba.app.entity.Partenaire;
+
 public class AdminUserPayload {
     public Long id;
     public String username;
@@ -81,6 +83,21 @@ public class AdminUserPayload {
 
     public void setPartenaire(Long partenaire) {
         this.partenaire = partenaire;
+    }
+
+    @Override
+    public String toString() {
+        return "AdminUserPayload{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", typeUser='" + typeUser + '\'' +
+                ", partenaire=" + partenaire +
+                '}';
     }
 
     //    id:this.data.data.id,
