@@ -53,6 +53,11 @@ public class PubliciteController {
         return publiciteService.getPublicitesByPage(page, size);
     }
 
+    @GetMapping("/delete/{id}")
+    public Map<String, Object> deletePub(@PathVariable Long id) {
+        return publiciteService.deletePub(id);
+    }
+
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {

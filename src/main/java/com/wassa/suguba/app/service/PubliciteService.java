@@ -39,7 +39,7 @@ public class PubliciteService {
         try {
             Optional<Publicite> publiciteOptional = publiciteRepository.findById(publicite.getId());
             if (publiciteOptional.isPresent()) {
-                publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK));
+                publicite.setPath(uploadFileService.updateImage(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK, publicite.getPath()));
                 Publicite publiciteSaced = publiciteRepository.save(publicite);
                 return Response.success(publiciteSaced, "Publicite modifiée.");
             }
@@ -79,6 +79,22 @@ public class PubliciteService {
             return Response.success(publicites, "Liste des publicites.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de la récuperation de liste.");
+        }
+    }
+
+    public Map<String, Object> deletePub(Long pubId) {
+        try {
+            Optional<Publicite> publiciteOptional = publiciteRepository.findById(pubId);
+            if (publiciteOptional.isPresent()) {
+                Publicite publicite = publiciteOptional.get();
+                publicite.setActive(false);
+                Publicite publiciteSaved = publiciteRepository.save(publicite);
+                return Response.success(publiciteSaved, "Publicité supprimée avec succès.");
+            } else {
+                return Response.error(null, "Cette publicité n'existe pas.");
+            }
+        } catch (Exception e) {
+            return Response.error(e, "Erreur de suppression de la publicité.");
         }
     }
 }

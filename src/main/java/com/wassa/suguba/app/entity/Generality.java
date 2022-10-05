@@ -38,7 +38,6 @@ public class Generality implements Serializable {
     @Column(name = "created_at", columnDefinition = "DATETIME")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S]")
     protected LocalDateTime createdAt= LocalDateTime.now();
 
     @LastModifiedDate
