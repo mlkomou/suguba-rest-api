@@ -532,67 +532,20 @@ public class AuthService {
             Optional<ApplicationUser> user = applicationUserRepository.findById(userId);
             if (user.isPresent()) {
                 ApplicationUser applicationUser = user.get();
+                applicationUser.setUsername(applicationUser.getUsername() + "_" + new Date().getTime() + "_removed");
                 applicationUser.setSupprime(false);
-               applicationUserRepository.save(applicationUser);
+               ApplicationUser userSaved = applicationUserRepository.save(applicationUser);
+                return Response.success(userSaved, "Votre compte a été supprimé avec succès.");
+            } else {
+                return Response.error(null, "Utilisateur supprimé.");
             }
-            return Response.success(null, "Utilisateur supprimé.");
+//            return Response.success(null, "Utilisateur supprimé.");
         } catch (Exception e) {
             return Response.error(e, "Erreur de suppression.");
         }
     }
 
-    public Map<String, Object> createUser(UserPayload userPayload) {
-        try {
-//            Client client = new Client();
-//            client.setEmail(userPayload.getEmail());
-//            client.set
-            if (userPayload.getId() != null) {
-                Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(userPayload.getId());
-                if (applicationUserOptional.isPresent()) {
-                    ApplicationUser oldUser = applicationUserOptional.get();
-                    Client client = oldUser.getClient();
-                    client.setNom(userPayload.getNom());
-                    client.setEmail(userPayload.getEmail());
-                    client.setPhone(userPayload.getPhone());
-                    client.setPrenom(userPayload.getPrenom());
-                    clientRepository.save(client);
 
-                    if (userPayload.getPartenaireId() != null) {
-                        Optional<Partenaire> partenaireOptional = partenaireRepository.findById(userPayload.getPartenaireId());
-                        oldUser.setPartenaire(partenaireOptional.get());
-                    }
-
-                    oldUser.setUsername(userPayload.getEmail());
-                    oldUser.setPassword(bCryptPasswordEncoder.encode(userPayload.getPassword()));
-                    ApplicationUser userUpdate = applicationUserRepository.save(oldUser);
-                    return Response.success(userUpdate, "Utuilisateur modifié.");
-                } else {
-                    return Response.error(null, "Cet uilisateur n'existe pas.");
-                }
-            } else {
-                Client client = new Client();
-                ApplicationUser user = new ApplicationUser();
-                client.setNom(userPayload.getNom());
-                client.setEmail(userPayload.getEmail());
-                client.setPhone(userPayload.getPhone());
-                client.setPrenom(userPayload.getPrenom());
-                Client clientSaved = clientRepository.save(client);
-
-                if (userPayload.getPartenaireId() != null) {
-                    Optional<Partenaire> partenaireOptional = partenaireRepository.findById(userPayload.getPartenaireId());
-                   user.setPartenaire(partenaireOptional.get());
-                }
-
-                user.setClient(clientSaved);
-                user.setUsername(userPayload.getEmail());
-                user.setPassword(bCryptPasswordEncoder.encode(userPayload.getPassword()));
-                ApplicationUser userSaved = applicationUserRepository.save(user);
-                return Response.success(userSaved, "Utilisateur enregistré");
-            }
-        } catch (Exception e) {
-            return Response.error(e, "Erreur d'enregistrement");
-        }
-    }
 
     public void sendEmail() throws MessagingException {
         sendEmailService.sendEmail();

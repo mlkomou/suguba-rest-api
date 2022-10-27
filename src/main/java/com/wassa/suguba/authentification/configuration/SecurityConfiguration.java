@@ -44,26 +44,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         LOGIN_UP_URL,
                         DOWNLOAD_CATEGORIE_URL,
                         DOWNLOAD_PRODUIT_URL,
-//                        DOWNLOAD_PRODUIT,
                         DOWNLOAD_CATEGORIE_URL,
                         PAIEMENT_URL,
                         APP_VERSION_URL,
                         PHARMACIE_VERSION_URL,
                         PAIEMENT_FACTURE_VERSION_URL,
                         PUB_URL,
-//                        DOWNLOAD_CATEGORIE,
-//                        DOWNLOAD_COMMANDE,
-//                        DOWNLOAD_PHARMACIE,
-//                        DOWNLOAD_VOYAGE,
-//                        DOWNLOAD_PAIEMENTFACTURE,
-//                        DOWNLOAD_IMMOBILIER,
-//                        BANQUE_IMMOBILIER,
+
                         CHECK_UP_URL,
-//                        LISTE_ENTREPRISE_UP_URL,
                         CREATE_USERU_URL,
                         SEND_SMS_URL,
                         SIGN_UP_SOUSCRIPTION_URL,
-                        FILE_DOWNLOAD_URL
+                        FILE_DOWNLOAD_URL,
+                        PUB_URL_LISTE,
+                        PRODUIT_URL_LISTE,
+                        CATEGORIE_URL_LISTE,
+                        PRODUIT_URL_CATEGORIE,
+                        DOWNLOAD_PHARMACIE,
+                        DOWNLOAD_VOYAGE,
+                        DOWNLOAD_PAIEMENTFACTURE,
+                        DOWNLOAD_IMMOBILIER,
+                        BANQUE_IMMOBILIER,
+                        AEROPORT
 
 
 //                        AEROPORT
