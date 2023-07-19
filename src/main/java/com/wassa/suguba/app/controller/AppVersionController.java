@@ -18,4 +18,9 @@ public class AppVersionController {
     public Map<String, Object> getAppVersion() {
         return appVersionService.getAppVersion();
     }
+
+    @GetMapping("/ios")
+    public Map<String, Object> getAppVersionIos() {
+        return appVersionService.getAppVersionIos();
+    }
 }
