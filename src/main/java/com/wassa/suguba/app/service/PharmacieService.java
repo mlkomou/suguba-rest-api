@@ -30,7 +30,7 @@ public class PharmacieService {
 
     public Map<String, Object> savePharmacie(Pharmacie pharmacie, MultipartFile photo) {
         try {
-            pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.PHARMACIE_DOWNLOAD_LINK));
+            pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK));
             Pharmacie pharmacieSaced = pharmacieRepository.save(pharmacie);
             return Response.success(pharmacieSaced, "Ordonance envoyée avec succès.");
         } catch (Exception e) {
@@ -42,7 +42,7 @@ public class PharmacieService {
         try {
             Optional<Pharmacie> pharmacieOptional = pharmacieRepository.findById(pharmacie.getId());
             if (pharmacieOptional.isPresent()) {
-                pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.PHARMACIE_DOWNLOAD_LINK));
+                pharmacie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK));
                 Pharmacie pharmacieSaced = pharmacieRepository.save(pharmacie);
                 return Response.success(pharmacieSaced, "ordonance modifiée.");
             }

@@ -32,7 +32,7 @@ public class BanqueService {
 
     public Map<String, Object> saveBanque(Banque banque, MultipartFile photo) {
         try {
-            banque.setPath(uploadFileService.uploadFile(photo, UploadPath.BANQUE_DOWNLOAD_LINK));
+            banque.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/banque"));
             Banque banqueSaced = banqueRepository.save(banque);
             if (banque.getMail() != null) {
                 String message = "Cher(e) "+banqueSaced.getPrenom()+ " "+banqueSaced.getNom()+", Votre demande de prêt est an cours de traitement. Nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA";
@@ -49,7 +49,7 @@ public class BanqueService {
         try {
             Optional<Banque> banqueOptional = banqueRepository.findById(banque.getId());
             if (banqueOptional.isPresent()) {
-                banque.setPath(uploadFileService.uploadFile(photo, UploadPath.BANQUE_DOWNLOAD_LINK));
+                banque.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/banque"));
                 Banque banqueSaced = banqueRepository.save(banque);
                 return Response.success(banqueSaced, "Banque modifiée.");
             }

@@ -1,45 +1,43 @@
 package com.wassa.suguba.app.controller;
 
 import com.wassa.suguba.app.constante.UploadPath;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import lombok.AllArgsConstructor;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLConnection;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/downloads")
+@AllArgsConstructor
 public class DownloadController {
-    @ResponseBody
-    @GetMapping("/download/{file}/{typeFile}")
-    public ResponseEntity<ByteArrayResource> getFiles(@PathVariable("file") String file, @PathVariable("typeFile") String typeFile) {
-        String path = "";
-        switch (typeFile) {
-            case "identite":
-                path = UploadPath.PIECE_DOWNLOAD_LINK;
-                break;
-            case "signature":
-                path = UploadPath.SIGNATURE_DOWNLOAD_LINK;
-                break;
-            case "pub":
-                path = UploadPath.PUBLICITE_DOWNLOAD_LINK;
-                break;
+    @GetMapping("/{folderName}/{fileName}")
+    public void downloadFiles(HttpServletResponse response,
+                              @PathVariable("fileName") String fileName,
+                              @PathVariable("folderName") String resourceName) throws IOException {
+
+        String path = UploadPath.DOWNLOAD_LINK + "/" + resourceName;
+        File file = new File(path + "/" + fileName);
+        if (file.exists()) {
+
+            //get the mimetype
+            String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
+
+            response.setContentType(mimeType);
+            response.setHeader("Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
+            response.setContentLength((int) file.length());
+
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+
+            FileCopyUtils.copy(inputStream, response.getOutputStream());
         }
-        try {
-            Path fileName = Paths.get(path, file);
-            byte[] buffer = Files.readAllBytes(fileName);
-            ByteArrayResource byteArrayResource = new ByteArrayResource(buffer);
-            return ResponseEntity.ok()
-                    .contentLength(buffer.length)
-                    .contentType(MediaType.parseMediaType("image/png"))
-                    .body(byteArrayResource);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return ResponseEntity.badRequest().build();
     }
 }

@@ -110,7 +110,7 @@ public class CommandeController {
     @ResponseBody
     @GetMapping("/logo/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.LOGO_DOWNLOAD_LINK;
+        String path = UploadPath.DOWNLOAD_LINK + "/logo";
         try {
             Path fileName = Paths.get(path, photo);
             byte[] buffer = Files.readAllBytes(fileName);

@@ -60,7 +60,7 @@ public class ImmobilierController {
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.IMMOBILIER_DOWNLOAD_LINK;
+        String path = UploadPath.DOWNLOAD_LINK + "/immobilier";
         try {
             Path fileName = Paths.get(path, photo);
             byte[] buffer = Files.readAllBytes(fileName);

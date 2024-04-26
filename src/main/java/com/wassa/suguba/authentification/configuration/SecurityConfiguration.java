@@ -20,8 +20,6 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.wassa.suguba.app.constante.UploadPath.PIECE_DOWNLOAD_LINK;
-import static com.wassa.suguba.app.constante.UploadPath.SIGNATURE_DOWNLOAD_LINK;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.*;
 
 
@@ -62,6 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         PRODUIT_URL_CATEGORIE,
                         DOWNLOAD_PHARMACIE,
                         DOWNLOAD_VOYAGE,
+                        DOWNLOAD_URL,
                         DOWNLOAD_PAIEMENTFACTURE,
                         DOWNLOAD_IMMOBILIER,
                         BANQUE_IMMOBILIER,

@@ -46,7 +46,7 @@ public class PaiementFactureService {
 
     public Map<String, Object> savePaiementFacture(PaiementFacture paiementFacture, MultipartFile photo) {
         try {
-            paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.FACTURE_DOWNLOAD_LINK));
+            paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/facture"));
             PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
             if (paiementFacture.getMail() != null) {
                 String message = "La demande de paiement de votre facture est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
@@ -65,7 +65,7 @@ public class PaiementFactureService {
         try {
             Optional<PaiementFacture> paiementFactureOptional = paiementFactureRepository.findById(paiementFacture.getId());
             if (paiementFactureOptional.isPresent()) {
-                paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                paiementFacture.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK));
                 PaiementFacture paiementFactureSaced = paiementFactureRepository.save(paiementFacture);
                 return Response.success(paiementFactureSaced, "PaiementFacture modifiée.");
             }

@@ -28,7 +28,7 @@ public class SousCategorieService {
 
     public Map<String, Object> saveSousCategorie(SousCategorie sousCategorie, MultipartFile photo) {
         try {
-            sousCategorie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            sousCategorie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/categorie"));
             SousCategorie sousCategorieSaced = sousSousCategorieRepository.save(sousCategorie);
             return Response.success(sousCategorieSaced, "SousCategorie enregistrée.");
         } catch (Exception e) {
@@ -40,7 +40,7 @@ public class SousCategorieService {
         try {
             Optional<SousCategorie> sousCategorieOptional = sousSousCategorieRepository.findById(sousCategorie.getId());
             if (sousCategorieOptional.isPresent()) {
-                sousCategorie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                sousCategorie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/categorie"));
                 SousCategorie sousCategorieSaced = sousSousCategorieRepository.save(sousCategorie);
                 return Response.success(sousCategorieSaced, "SousCategorie modifiée.");
             }

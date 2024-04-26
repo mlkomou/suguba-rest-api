@@ -27,7 +27,9 @@ public class CategorieService {
     }
     public Map<String, Object> saveCategorie(Categorie categorie, MultipartFile photo) {
         try {
-            categorie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+            if (photo != null) {
+                categorie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/categorie"));
+            }
             Categorie categorieSaced = categorieRepository.save(categorie);
             return Response.success(categorieSaced, "Categorie enregistrée.");
         } catch (Exception e) {
@@ -40,7 +42,7 @@ public class CategorieService {
         try {
             Optional<Categorie> categorieOptional = categorieRepository.findById(categorie.getId());
             if (categorieOptional.isPresent()) {
-                categorie.setPath(uploadFileService.uploadFile(photo, UploadPath.CATEGORIE_DOWNLOAD_LINK));
+                categorie.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/categorie"));
                 Categorie categorieSaced = categorieRepository.save(categorie);
                 return Response.success(categorieSaced, "Categorie modifiée.");
             }

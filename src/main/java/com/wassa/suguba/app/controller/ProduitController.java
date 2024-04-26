@@ -62,23 +62,4 @@ public class ProduitController {
         return produitService.deepSearch(searchTerm, page, size);
     }
 
-    @ResponseBody
-    @GetMapping("/download/{photo}")
-    public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.PRODUIT_DOWNLOAD_LINK;
-        try {
-            Path fileName = Paths.get(path, photo);
-            byte[] buffer = Files.readAllBytes(fileName);
-            ByteArrayResource byteArrayResource = new ByteArrayResource(buffer);
-            return ResponseEntity.ok()
-                    .contentLength(buffer.length)
-                    .contentType(MediaType.parseMediaType("image/png"))
-                    .body(byteArrayResource);
-        } catch (Exception e) {
-            System.err.println(e);
-            // TODO: handle exception
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
 }

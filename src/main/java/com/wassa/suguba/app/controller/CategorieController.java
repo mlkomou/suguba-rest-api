@@ -26,7 +26,7 @@ public class CategorieController {
     }
     @PostMapping()
     public Map<String, Object> saveCategorie(@RequestParam("categorie") String categorieString,
-                                             @RequestParam("photo") MultipartFile photo) throws JsonProcessingException {
+                                             @RequestParam(value = "photo", required = false) MultipartFile photo) throws JsonProcessingException {
         Categorie categorie = new ObjectMapper().readValue(categorieString, Categorie.class);
         return categorieService.saveCategorie(categorie, photo);
     }
@@ -53,23 +53,5 @@ public class CategorieController {
         return categorieService.getCategoriesByPage(page, size);
     }
 
-    @ResponseBody
-    @GetMapping("/download/{photo}")
-    public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.CATEGORIE_DOWNLOAD_LINK;
-        try {
-            Path fileName = Paths.get(path, photo);
-            byte[] buffer = Files.readAllBytes(fileName);
-            ByteArrayResource byteArrayResource = new ByteArrayResource(buffer);
-            return ResponseEntity.ok()
-                    .contentLength(buffer.length)
-                    .contentType(MediaType.parseMediaType("image/png"))
-                    .body(byteArrayResource);
-        } catch (Exception e) {
-            System.err.println(e);
-            // TODO: handle exception
-        }
-        return ResponseEntity.badRequest().build();
-    }
 
 }

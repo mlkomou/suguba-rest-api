@@ -67,7 +67,7 @@ public class PaiementFactureController {
     @ResponseBody
     @GetMapping("/download/{photo}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable("photo") String photo) {
-        String path = UploadPath.FACTURE_DOWNLOAD_LINK;
+        String path = UploadPath.DOWNLOAD_LINK;
         try {
             Path fileName = Paths.get(path, photo);
             byte[] buffer = Files.readAllBytes(fileName);

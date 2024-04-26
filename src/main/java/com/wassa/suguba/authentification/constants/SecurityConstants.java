@@ -25,6 +25,7 @@ public class SecurityConstants {
 //    public static final String DOWNLOAD_CATEGORIE = "/categories/**";
 //    public static final String DOWNLOAD_COMMANDE = "/commandes/**";
     public static final String DOWNLOAD_PHARMACIE = "/pharmacies/**";
+    public static final String DOWNLOAD_URL = "/downloads/**";
     public static final String DOWNLOAD_VOYAGE = "/voyages/**";
     public static final String DOWNLOAD_PAIEMENTFACTURE = "/paiement_factures/**";
     public static final String DOWNLOAD_IMMOBILIER = "/immobiliers/**";

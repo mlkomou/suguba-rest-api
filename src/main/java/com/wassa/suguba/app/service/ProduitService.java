@@ -23,31 +23,22 @@ public class ProduitService {
     private final ProduitRepository produitRepository;
     private final UploadFileService uploadFileService;
     private final FilesRepository filesRepository;
-    private final FournisseurRepository fournisseurRepository;
 
-    public ProduitService(ProduitRepository produitRepository, UploadFileService uploadFileService, FilesRepository filesRepository, FournisseurRepository fournisseurRepository) {
+    public ProduitService(ProduitRepository produitRepository, UploadFileService uploadFileService, FilesRepository filesRepository) {
         this.produitRepository = produitRepository;
         this.uploadFileService = uploadFileService;
         this.filesRepository = filesRepository;
-        this.fournisseurRepository = fournisseurRepository;
     }
 
 
     public Map<String, Object> saveProduit(Produit produit, List<MultipartFile> files) {
         try {
-//            Fournisseur fournisseurToSave = produit.getFournisseur();
-//            if (fournisseurToSave != null) {
-//                Optional<Fournisseur> fournisseurOptional = fournisseurRepository.findById(fournisseurToSave.getId());
-//                produit.setFournisseur(fournisseurOptional.get());
-//            }
-            System.err.println("file size: " + files.size());
             Produit produitSaved = produitRepository.save(produit);
             files.forEach(multipartFile -> {
                 try {
-                    System.err.println("filename: " + multipartFile.getOriginalFilename());
                     Files files1 = new Files();
                     files1.setProduit(produitSaved);
-                    files1.setPath(uploadFileService.uploadFile(multipartFile, UploadPath.PRODUIT_DOWNLOAD_LINK));
+                    files1.setPath(uploadFileService.uploadFile(multipartFile, UploadPath.DOWNLOAD_LINK + "/produit"));
                     files1.setName(multipartFile.getOriginalFilename());
                     files1.setType(multipartFile.getContentType());
                     filesRepository.save(files1);

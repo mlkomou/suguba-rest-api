@@ -27,7 +27,7 @@ public class PubliciteService {
     }
     public Map<String, Object> savePublicite(Publicite publicite, MultipartFile photo) {
         try {
-            publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK));
+            publicite.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/publicite"));
             Publicite publiciteSaced = publiciteRepository.save(publicite);
             return Response.success(publiciteSaced, "Publicite enregistrée.");
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class PubliciteService {
         try {
             Optional<Publicite> publiciteOptional = publiciteRepository.findById(publicite.getId());
             if (publiciteOptional.isPresent()) {
-                publicite.setPath(uploadFileService.updateImage(photo, UploadPath.PUBLICITE_DOWNLOAD_LINK, publicite.getPath()));
+                publicite.setPath(uploadFileService.updateImage(photo, UploadPath.DOWNLOAD_LINK + "/publicite", publicite.getPath()));
                 Publicite publiciteSaced = publiciteRepository.save(publicite);
                 return Response.success(publiciteSaced, "Publicite modifiée.");
             }

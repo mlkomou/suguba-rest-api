@@ -46,7 +46,7 @@ public class VoyageService {
 
     public Map<String, Object> saveVoyage(Voyage voyage, MultipartFile photo) {
         try {
-            voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.VOYAGE_DOWNLOAD_LINK));
+            voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/voyage"));
             Voyage voyageSaced = voyageRepository.save(voyage);
             if (voyage.getMail() != null) {
                 String message = "Votre demande de voyage est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";
@@ -62,7 +62,7 @@ public class VoyageService {
         try {
             Optional<Voyage> voyageOptional = voyageRepository.findById(voyage.getId());
             if (voyageOptional.isPresent()) {
-                voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.VOYAGE_DOWNLOAD_LINK));
+                voyage.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/voyage"));
                 Voyage voyageSaced = voyageRepository.save(voyage);
                 return Response.success(voyageSaced, "Voyage modifiée.");
             }

@@ -31,7 +31,7 @@ public class ImmobilierService {
 
     public Map<String, Object> saveImmobilierWithFile(Immobilier immobilier, MultipartFile photo) {
         try {
-            immobilier.setPath(uploadFileService.uploadFile(photo, UploadPath.IMMOBILIER_DOWNLOAD_LINK));
+            immobilier.setPath(uploadFileService.uploadFile(photo, UploadPath.DOWNLOAD_LINK + "/immobilier"));
             Immobilier immobilierSaved = immobilierRepository.save(immobilier);
             if (immobilier.getMail() != null) {
                 String message = "Votre demande est en cours de traitement, nous vous contacterons pour la suite. Merci d'avoir choisi SUGUBA.";

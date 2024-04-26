@@ -25,21 +25,13 @@ public class InitUsers implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-//
-//        List<Produit> produits = produitRepository.findAll();
-//        produits.forEach(produit -> {
-//            if (produit.getFournisseur() == null) {
-//                Fournisseur fournisseur = fournisseurRepository.getById(1L);
-//                produit.setFournisseur(fournisseur);
-//                produitRepository.save(produit);
-//            }
-//        });
-        Optional<ApplicationUser> applicationUserOptional = applicationUser.findByUsername("suguba@gmail.com");
+
+        Optional<ApplicationUser> applicationUserOptional = applicationUser.findByUsername("komou35@gmail.com");
         if (applicationUserOptional.isPresent()) return;
         ApplicationUser user = new  ApplicationUser();
 
-        user.setUsername("suguba@gmail.com");
-        user.setPassword(bCryptPasswordEncoder.encode("suguba"));
+        user.setUsername("komou35@gmail.com");
+        user.setPassword(bCryptPasswordEncoder.encode("77114120"));
         user.setType("Admin");
         applicationUser.save(user);
 

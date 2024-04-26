@@ -10,6 +10,7 @@ import com.wassa.suguba.authentification.entity.ApplicationUser;
 import com.wassa.suguba.authentification.entity.Response;
 import com.wassa.suguba.authentification.entity.UserConnected;
 import com.wassa.suguba.authentification.repo.ApplicationUserRepository;
+import com.wassa.suguba.smsSender.SmsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,13 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import java.io.IOException;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.wassa.suguba.app.constante.UploadPath.PIECE_DOWNLOAD_LINK;
-import static com.wassa.suguba.app.constante.UploadPath.SIGNATURE_DOWNLOAD_LINK;
+import static com.wassa.suguba.app.constante.UploadPath.DOWNLOAD_LINK;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.EXPIRATION_TIME;
 import static com.wassa.suguba.authentification.constants.SecurityConstants.KEY;
 
@@ -54,9 +53,10 @@ public class AuthService {
     private final SendEmailService sendEmailService;
     private final PhoneNumbersRepository phoneNumbersRepository;
     private final UploadFileService uploadFileService;
-    private final FilesRepository filesRepository;
+    private final SmsService smsService;
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository, UploadFileService uploadFileService, FilesRepository filesRepository) {
+
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository, UploadFileService uploadFileService, SmsService smsService) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
@@ -69,7 +69,7 @@ public class AuthService {
         this.sendEmailService = sendEmailService;
         this.phoneNumbersRepository = phoneNumbersRepository;
         this.uploadFileService = uploadFileService;
-        this.filesRepository = filesRepository;
+        this.smsService = smsService;
     }
 
     public ResponseEntity<Map<String, Object>> loginUser(ApplicationUser applicationUser) {
@@ -244,9 +244,9 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setRib(souscriptionPayload.getRib());
-                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
-//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
-                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/pieces"));
+//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, DOWNLOAD_LINK + "/piece));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signatures"));
                     demandeSouscriptionRepository.save(demandeSouscription);
 
                     sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
@@ -266,9 +266,9 @@ public class AuthService {
                 souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                 souscrition.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                 souscrition.setRib(souscriptionPayload.getRib());
-                souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
-//                souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
-                souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
+                souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/pieces"));
+//                souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, DOWNLOAD_LINK + "/piece));
+                souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signatures"));
                 demandeSouscriptionRepository.save(souscrition);
                 sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
 
@@ -279,7 +279,8 @@ public class AuthService {
             }
 
         } catch (Exception e) {
-            return Response.error(e, "Erreur dinscription, Veuillez réessayer plus tard.");
+            System.err.println(e);
+            return Response.error(e, "Erreur d'inscription, Veuillez réessayer plus tard.");
         }
     }
 
@@ -308,9 +309,9 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setRib(souscriptionPayload.getRib());
-                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
-//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
-                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/piece"));
+//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, DOWNLOAD_LINK + "/piece));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signature"));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
                     //enregistrement de la demande de souscription
                     sendSmsService.sendSmsSingle(client.getPhone(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
@@ -325,9 +326,9 @@ public class AuthService {
                     demandeSouscription.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                     demandeSouscription.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                     demandeSouscription.setRib(souscriptionPayload.getRib());
-                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, PIECE_DOWNLOAD_LINK));
-//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, PIECE_DOWNLOAD_LINK));
-                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, SIGNATURE_DOWNLOAD_LINK));
+                    demandeSouscription.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/piece"));
+//                    demandeSouscription.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, DOWNLOAD_LINK + "/piece));
+                    demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signature"));
                     demandeSouscription.setStatut("TRAITEMENT");
                     demandeSouscription.setUser(user.get());
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
@@ -336,22 +337,6 @@ public class AuthService {
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 }
 
-//                if (souscritionOptional.isPresent()) {
-//                    Souscrition souscritionOld = souscritionOptional.get();
-//                    if (souscritionOld.getActive()) {
-//                        return new ResponseEntity<>(Response.success(souscritionOld, "Vous avez déjà une souscrition en cours."), HttpStatus.OK);
-//                    }
-//                    souscritionOld.setMontant(souscriptionPayload.getMontant());
-//                    souscritionOld.setNomService(souscriptionPayload.getNomService());
-//                    Souscrition souscritionUpdated = souscritionRepository.save(souscritionOld);
-//                    return new ResponseEntity<>(Response.success(souscritionUpdated, "Vous aviez déjà une souscrition non active, elle a été modifiée."), HttpStatus.OK);
-//                }
-//                Souscrition souscrition = new Souscrition();
-//                souscrition.setNomService(souscriptionPayload.getNomService());
-//                souscrition.setMontant(souscriptionPayload.getMontant());
-//                souscrition.setUser(user.get());
-//                Souscrition souscritionSaved = souscritionRepository.save(souscrition);
-//                return new ResponseEntity<>(Response.success(souscritionSaved, "Souscrition enregistrée"), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(Response.error(null, "Cet utilisateur n'existe pas."), HttpStatus.OK);
             }
@@ -427,71 +412,41 @@ public class AuthService {
     public Map<String, Object> sendconfirmationCode(String phone) {
         try {
             Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
-
             if (phoneVerificationOptional.isPresent()) {
 
-                String codeConf = makePassword(4);
-
-                SmsObject smsObject = new SmsObject();
-                List<Smses> smses = new ArrayList<>();
-                Smses smses1 = new Smses();
-                smses1.setText(codeConf + " " + "est votre code de vérification pour SUGUBA.");
-                smses1.setPhoneNumber("+223" + phone);
-                smses.add(smses1);
-
-                smsObject.setLogin("kamara");
-                smsObject.setPassword("Bengaly2021!");
-                smsObject.setSenderId("SUGUBA");
-                smsObject.setSmses(smses);
+                String codeConf = "1234";
+//                String codeConf = makePassword(4);
+                String message = codeConf + " est votre code de vérification pour GOUABO.";
 
                 PhoneVerification phoneVerification = phoneVerificationOptional.get();
                 if (Objects.equals(phone, "69686734")) {
                     phoneVerification.setVerificationCode("1234");
-                    SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
-                    if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
-                        return Response.success(smsMessageResponse, "Code envoyé");
-                    } else {
-                        return Response.error(smsMessageResponse, "Erreur d'envoie du code");
-                    }
+//                    smsService.sendSimpleSMs();
+                } else {
+                    phoneVerification.setVerificationCode(codeConf);
                 }
 
-                phoneVerification.setVerificationCode(codeConf);
-//                phoneVerificationRepository.save(phoneVerification);
-                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
+               if (!Objects.equals(phone, "69686734")) {
+                   smsService.sendSimpleSMs(phone, message, "GOUABO");
+               }
 
                 phoneVerificationRepository.save(phoneVerification);
 
-                if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
-                    return Response.success(smsMessageResponse, "Code envoyé");
-                } else {
-                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
-                }
+                return Response.success(phone, "Code SMS envoyé");
 
             } else {
-                String codeConf = makePassword(4);
-                SmsObject smsObject = new SmsObject();
-                List<Smses> smses = new ArrayList<>();
-                Smses smses1 = new Smses();
-                smses1.setText(codeConf + " " + "est votre de vérification pour SUGUBA.");
-                smses1.setPhoneNumber("+223" + phone);
-                smses.add(smses1);
-
-                smsObject.setLogin("kamara");
-                smsObject.setPassword("Bengaly2021!");
-                smsObject.setSenderId("WASSA PAY");
-                smsObject.setSmses(smses);
+                String codeConf = "1234";
+//                String codeConf = makePassword(4);
+                String message = codeConf + " est votre code de vérification pour GOUABO.";
 
                 PhoneVerification phoneVerification = new PhoneVerification();
                 phoneVerification.setVerificationCode(codeConf);
                 phoneVerification.setPhone(phone);
                 phoneVerificationRepository.save(phoneVerification);
 
-                SmsMessageResponse smsMessageResponse = sendSmsService.sendSms(smsObject);
-                if (Objects.equals(smsMessageResponse.getStatus(), "OK")) {
-                    return Response.success(smsMessageResponse, "Code envoyé");
-                } else {
-                    return Response.error(smsMessageResponse, "Erreur d'envoie du code");
-                }
+                smsService.sendSimpleSMs(phone, message, "GOUABO");
+
+                return Response.success(phone, "Code SMS envoyé");
             }
         } catch (Exception e) {
             return Response.error(e, "Erreur d'envoie du code");
