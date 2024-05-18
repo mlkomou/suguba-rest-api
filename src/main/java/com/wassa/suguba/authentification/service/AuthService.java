@@ -45,7 +45,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final PhoneVerificationRepository phoneVerificationRepository;
-    private final SendSmsService sendSmsService;
+//    private final SendSmsService sendSmsService;
     private final ClientRepository clientRepository;
     private final SouscritionRepository souscritionRepository;
     private final PartenaireRepository partenaireRepository;
@@ -56,12 +56,12 @@ public class AuthService {
     private final SmsService smsService;
 
 
-    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, SendSmsService sendSmsService, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository, UploadFileService uploadFileService, SmsService smsService) {
+    public AuthService(ApplicationUserRepository applicationUserRepository, AuthenticationManager authenticationManager, BCryptPasswordEncoder bCryptPasswordEncoder1, PhoneVerificationRepository phoneVerificationRepository, ClientRepository clientRepository, SouscritionRepository souscritionRepository, PartenaireRepository partenaireRepository, DemandeSouscriptionRepository demandeSouscriptionRepository, SendEmailService sendEmailService, PhoneNumbersRepository phoneNumbersRepository, UploadFileService uploadFileService, SmsService smsService) {
         this.applicationUserRepository = applicationUserRepository;
         this.authenticationManager = authenticationManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder1;
         this.phoneVerificationRepository = phoneVerificationRepository;
-        this.sendSmsService = sendSmsService;
+//        this.sendSmsService = sendSmsService;
         this.clientRepository = clientRepository;
         this.souscritionRepository = souscritionRepository;
         this.partenaireRepository = partenaireRepository;
@@ -249,7 +249,9 @@ public class AuthService {
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signatures"));
                     demandeSouscriptionRepository.save(demandeSouscription);
 
-                    sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+                    String message = "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  GOUABO vous remercie.";
+
+                    smsService.sendSimpleSMs(user.getUsername(), message, "GOUABO");
 
                     return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
                 }
@@ -266,11 +268,13 @@ public class AuthService {
                 souscrition.setAgenceDomiciliation(souscriptionPayload.getAgenceDomiciliation());
                 souscrition.setAdresseBanque(souscriptionPayload.getAdresseBanque());
                 souscrition.setRib(souscriptionPayload.getRib());
-                souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/pieces"));
+                souscrition.setIdentitePath(uploadFileService.uploadFile(identiteFile, DOWNLOAD_LINK + "/piece"));
 //                souscrition.setIdentite2Path(uploadFileService.uploadFile(identiteFileVerso, DOWNLOAD_LINK + "/piece));
-                souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signatures"));
+                souscrition.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signature"));
                 demandeSouscriptionRepository.save(souscrition);
-                sendSmsService.sendSmsSingle(user.getUsername(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
+                String message = "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  GOUABO vous remercie.";
+                smsService.sendSimpleSMs(user.getUsername(), message, "GOUABO");
 
 
                 return Response.success(userConnected, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent.");
@@ -286,8 +290,7 @@ public class AuthService {
 
     public ResponseEntity<Map<String, Object>> souscriptionInApp(SouscriptionPayload souscriptionPayload,
                                                                  MultipartFile identiteFile,
-                                                                 MultipartFile signatureFile,
-                                                                 MultipartFile identiteFileVerso) {
+                                                                 MultipartFile signatureFile) {
         try {
             Optional<ApplicationUser> user = applicationUserRepository.findById(souscriptionPayload.getUserId());
 
@@ -314,7 +317,9 @@ public class AuthService {
                     demandeSouscription.setSignaturePath(uploadFileService.uploadFile(signatureFile, DOWNLOAD_LINK + "/signature"));
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
                     //enregistrement de la demande de souscription
-                    sendSmsService.sendSmsSingle(client.getPhone(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+
+                    String message = "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  GOUABO vous remercie.";
+                    smsService.sendSimpleSMs(client.getPhone(), message, "GOUABO");
 
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 } else {
@@ -332,7 +337,8 @@ public class AuthService {
                     demandeSouscription.setStatut("TRAITEMENT");
                     demandeSouscription.setUser(user.get());
                     DemandeSouscription demandeSouscriptionSaved =  demandeSouscriptionRepository.save(demandeSouscription);
-                    sendSmsService.sendSmsSingle(client.getPhone(), "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  SUGUBA vous remercie.");
+                    String message = "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent. "+"\n"+"  GOUABO vous remercie.";
+                    smsService.sendSimpleSMs(client.getPhone(), message, "GOUABO");
 
                     return new ResponseEntity<>(Response.success(demandeSouscriptionSaved, "Le traitement de votre souscription est en cours de validation. Nous vous appellerons dans les heures qui suivent."), HttpStatus.OK);
                 }
@@ -414,8 +420,8 @@ public class AuthService {
             Optional<PhoneVerification> phoneVerificationOptional = phoneVerificationRepository.findByPhone(phone);
             if (phoneVerificationOptional.isPresent()) {
 
-                String codeConf = "1234";
-//                String codeConf = makePassword(4);
+//                String codeConf = "1234";
+                String codeConf = makePassword(4);
                 String message = codeConf + " est votre code de vérification pour GOUABO.";
 
                 PhoneVerification phoneVerification = phoneVerificationOptional.get();
@@ -435,8 +441,8 @@ public class AuthService {
                 return Response.success(phone, "Code SMS envoyé");
 
             } else {
-                String codeConf = "1234";
-//                String codeConf = makePassword(4);
+//                String codeConf = "1234";
+                String codeConf = makePassword(4);
                 String message = codeConf + " est votre code de vérification pour GOUABO.";
 
                 PhoneVerification phoneVerification = new PhoneVerification();

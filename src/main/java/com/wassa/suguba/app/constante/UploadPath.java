@@ -1,6 +1,7 @@
 package com.wassa.suguba.app.constante;
 
 public class UploadPath {
+//    public static final String DOWNLOAD_LINK = "/var/www/GOUABO";
     public static final String DOWNLOAD_LINK = "/Volumes/Data/free/wassaEcommerce/files";
 //    public static final String PUBLICITE_DOWNLOAD_LINK = "/Volumes/Data/free/wassaEcommerce/files/publicite";
 //    public static final String VOYAGE_DOWNLOAD_LINK = "/Volumes/Data/free/wassaEcommerce/files/voyage";
